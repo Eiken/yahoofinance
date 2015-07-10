@@ -5,7 +5,7 @@ from datetime import datetime
 from datetime import timedelta
 import re
 import json
-#from willie import module
+from willie import module
 
 #tickers = 'PRIC-B.ST'
 #tickers = 'G5EN.ST'
