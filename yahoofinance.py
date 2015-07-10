@@ -3,21 +3,21 @@ import urllib
 from datetime import datetime
 from datetime import timedelta
 import re
+import json
 from willie import module
 
 #ticker = 'PRIC-B.ST'
 #ticker = 'G5EN.ST'
 
 #arg = '3m'
-#arg = '1y3m'
+#arg = '1y'
 #arg = '15d'
 #arg = None
 
 
 
 @module.commands('yftest')
-def yf(bot, trigger):
-    
+def yf(bot, trigger):  
     url = 'https://query.yahooapis.com/v1/public/yql?'
     
     ticker = trigger.group(3)
@@ -25,6 +25,7 @@ def yf(bot, trigger):
     
     if not ticker:
         bot.say("No arguments passed")
+        #pass
         return
         
     
@@ -66,7 +67,7 @@ def yf(bot, trigger):
         }
         query = url + urllib.urlencode(q)
         result = requests.get(query)
-        dic = eval(result.content)
+        dic = json.loads(result.content)
         quoteList = dic.get('query').get('results').get('quote')
 
         if len(quoteList) > 1:
@@ -93,7 +94,7 @@ def yf(bot, trigger):
 
         query = url + urllib.urlencode(q)
         result = requests.get(query)
-        dic = eval(result.content)
+        dic = json.loads(result.content)
         quote = dic.get('query').get('results').get('quote')
         latest = quote.get('LastTradePriceOnly')
         percentage = quote.get('Change')
