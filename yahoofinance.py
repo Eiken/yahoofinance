@@ -151,7 +151,7 @@ def runMe(bot, tickers, arg):
         output(bot, out)
 
 try:
-    @module.commands('yftest')
+    @module.commands('yf')
     def yf(bot, trigger):    
         tickers = trigger.group(3)
         arg = trigger.group(4)
@@ -165,6 +165,7 @@ def test():
     #tickers = 'G5EN.ST'
     #tickers = 'G5EN.ST,PRIC-B.ST'
     tickers = 'apple,pricer'
+    tickers = 'microsoft,fingerprint,pricer'
 
     #arg = '3m'
     #arg = '1y'
