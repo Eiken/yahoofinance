@@ -5,17 +5,11 @@ from datetime import datetime
 from datetime import timedelta
 import re
 import json
-from willie import module
 
-#tickers = 'PRIC-B.ST'
-#tickers = 'G5EN.ST'
-#tickers = 'G5EN.ST,PRIC-B.ST'
-#tickers = 'apple,pricer'
-
-#arg = '3m'
-#arg = '1y'
-#arg = '15d'
-#arg = None
+try:
+    from willie import module
+except:
+    module = None
 
 def getTicker(name):
     url = "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
@@ -84,16 +78,15 @@ def getQuoteForRange(ticker, start, end):
     else:
         return None, None, None
 
-@module.commands('yftest')
-def yf(bot, trigger):  
-#def test(arg, tickers):
+def output(out):
+    if module is not None:
+        bot.say(out)
+    else:
+        print out
 
-    
-    tickers = trigger.group(3)
-    arg = trigger.group(4)
+def runMe(tickers, arg):
     if not tickers:
-        bot.say("No arguments passed")
-        #pass
+        output("No arguments passed")
         return
 
     tickers = tickers.split(',')
@@ -140,11 +133,7 @@ def yf(bot, trigger):
             else:
                 percentage = 0.0
             out = "{0} period quote: startdate: {1}; quote: {2}, enddate {3}; quote {4}. change: ({5:.2f}%)".format(ticker, startDateString, old, endDateString, latest, percentage)
-            #print out
-            bot.say(out)
-            
-            
-            
+            output(out)         
 
         else:
             latest, percentage = getCurrentQuote(ticker)
@@ -155,12 +144,34 @@ def yf(bot, trigger):
                 totalPercentage.append(percentage)
 
             out = 'Latest {0} quote is: {1} ({2}%)'.format(ticker, latest, percentage)
-            #print out
-            bot.say(out)
+            output(out)
 
     if len(totalPercentage) > 1:
         out = 'Average change: {0:.2f}%'.format(sum(totalPercentage)/float(len(totalPercentage)))
-        #print out
-        bot.say(out)
+        output(out)
 
-#test(arg, tickers)
+try:
+    @module.commands('yftest')
+    def yf(bot, trigger):    
+        tickers = trigger.group(3)
+        arg = trigger.group(4)
+        runMe(tickers, arg)
+except:
+    #module not available
+    pass
+
+def test():
+    #tickers = 'PRIC-B.ST'
+    #tickers = 'G5EN.ST'
+    #tickers = 'G5EN.ST,PRIC-B.ST'
+    tickers = 'apple,pricer'
+
+    #arg = '3m'
+    #arg = '1y'
+    #arg = '15d'
+    arg = None
+
+    runMe(tickers, arg)
+
+if __name__ == "__main__":
+    test()
