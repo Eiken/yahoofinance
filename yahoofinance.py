@@ -6,30 +6,31 @@ import re
 import json
 from willie import module
 
-#ticker = 'PRIC-B.ST'
-#ticker = 'G5EN.ST'
+#tickers = 'PRIC-B.ST'
+#tickers = 'G5EN.ST'
+#tickers = 'G5EN.ST,PRIC-B.ST'
 
 #arg = '3m'
 #arg = '1y'
 #arg = '15d'
 #arg = None
 
-
-
 @module.commands('yftest')
 def yf(bot, trigger):  
+#def test(arg, tickers):
     url = 'https://query.yahooapis.com/v1/public/yql?'
     
     tickers = trigger.group(3)
     arg = trigger.group(4)
-    
     if not tickers:
         bot.say("No arguments passed")
         #pass
         return
-        
-    
-    for ticker in tickers.split(','):
+
+    tickers = tickers.split(',')
+    totalPercentage = 0.0    
+
+    for ticker in tickers:
 
         if arg is not None:
             days = re.findall('(\d+)(d)', arg) 
@@ -78,6 +79,8 @@ def yf(bot, trigger):
                 percentage = (latest - old) / old
                 percentage *= 100.0
 
+                totalPercentage += percentage
+
 
                 out = "{0} period quote: startdate: {1}; quote: {2}, enddate {3}; quote {4}. change: ({5:.2f}%)".format(ticker, startDateString, old, endDateString, latest, percentage)
                 #print out
@@ -98,9 +101,18 @@ def yf(bot, trigger):
             dic = json.loads(result.content)
             quote = dic.get('query').get('results').get('quote')
             latest = quote.get('LastTradePriceOnly')
-            percentage = quote.get('Change')
+            percentage = float(quote.get('Change'))
+            totalPercentage += percentage
 
             out = 'Latest {0} quote is: {1} ({2}%)'.format(ticker, latest, percentage)
             #print out
             bot.say(out)
 
+    numTickers = len(tickers)
+    if numTickers > 1:
+        #print numTickers
+        out = 'Average change: {0:.2f}%'.format(totalPercentage/float(numTickers))
+        #print out
+        bot.say(out)
+
+#test(arg, tickers)
