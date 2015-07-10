@@ -78,15 +78,15 @@ def getQuoteForRange(ticker, start, end):
     else:
         return None, None, None
 
-def output(out):
-    if module is not None:
+def output(bot, out):
+    if bot is not None:
         bot.say(out)
     else:
         print out
 
-def runMe(tickers, arg):
+def runMe(bot, tickers, arg):
     if not tickers:
-        output("No arguments passed")
+        output(bot, "No arguments passed")
         return
 
     tickers = tickers.split(',')
@@ -133,7 +133,7 @@ def runMe(tickers, arg):
             else:
                 percentage = 0.0
             out = "{0} period quote: startdate: {1}; quote: {2}, enddate {3}; quote {4}. change: ({5:.2f}%)".format(ticker, startDateString, old, endDateString, latest, percentage)
-            output(out)         
+            output(bot, out)         
 
         else:
             latest, percentage = getCurrentQuote(ticker)
@@ -144,18 +144,18 @@ def runMe(tickers, arg):
                 totalPercentage.append(percentage)
 
             out = 'Latest {0} quote is: {1} ({2}%)'.format(ticker, latest, percentage)
-            output(out)
+            output(bot, out)
 
     if len(totalPercentage) > 1:
         out = 'Average change: {0:.2f}%'.format(sum(totalPercentage)/float(len(totalPercentage)))
-        output(out)
+        output(bot, out)
 
 try:
     @module.commands('yftest')
     def yf(bot, trigger):    
         tickers = trigger.group(3)
         arg = trigger.group(4)
-        runMe(tickers, arg)
+        runMe(bot, tickers, arg)
 except:
     #module not available
     pass
@@ -171,7 +171,7 @@ def test():
     #arg = '15d'
     arg = None
 
-    runMe(tickers, arg)
+    runMe(None, tickers, arg)
 
 if __name__ == "__main__":
     test()
