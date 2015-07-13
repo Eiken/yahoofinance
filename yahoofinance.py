@@ -67,16 +67,15 @@ def getQuoteForRange(ticker, start, end):
     if results:
         quoteList = results.get('quote')
 
-        if len(quoteList) > 1:
+        if not type(quoteList) is dict:
             latest = float(quoteList[0].get('Close'))
             old = float(quoteList[-1].get('Close'))    
 
             percentage = (latest - old) / old
             percentage *= 100.0
 
-        return latest, old, percentage
-    else:
-        return None, None, None
+            return latest, old, percentage
+    return None, None, None
 
 def output(bot, out):
     if bot is not None:
@@ -166,11 +165,13 @@ def test():
     #tickers = 'G5EN.ST,PRIC-B.ST'
     tickers = 'apple,pricer'
     tickers = 'microsoft,fingerprint,pricer'
+    tickers = 'pricer,microsoft'
 
     #arg = '3m'
     #arg = '1y'
     #arg = '15d'
-    arg = None
+    #arg = None
+    arg = '3d'
 
     runMe(None, tickers, arg)
 
