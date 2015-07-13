@@ -45,8 +45,14 @@ def getCurrentQuote(ticker):
         return None, None
 
     latest = quote.get('LastTradePriceOnly')
+#    print quote
     if latest:
-        percentage = float(quote.get('Change'))
+        latest = float(latest)
+        change = float(quote.get('Change'))
+        o = latest - change
+        percentage = (latest / o) - 1.0
+        percentage *= 100.0
+        
     else:
         percentage = None
 
@@ -141,8 +147,10 @@ def runMe(bot, tickers, arg):
                 latest, percentage = getCurrentQuote(ticker)
             if percentage:
                 totalPercentage.append(percentage)
+            else:
+                percentage = 0.0
 
-            out = 'Latest {0} quote is: {1} ({2}%)'.format(ticker, latest, percentage)
+            out = 'Latest {0} quote is: {1} ({2:.2f}%)'.format(ticker, latest, percentage)
             output(bot, out)
 
     #if len(totalPercentage) > 1:
@@ -165,13 +173,13 @@ def test():
     #tickers = 'G5EN.ST,PRIC-B.ST'
     tickers = 'apple,pricer'
     tickers = 'microsoft,fingerprint,pricer'
-    tickers = 'pricer,microsoft'
+    tickers = 'pricer,bahnhof'
 
     #arg = '3m'
     #arg = '1y'
     #arg = '15d'
-    #arg = None
-    arg = '3d'
+    arg = None
+    #arg = '3d'
 
     runMe(None, tickers, arg)
 
