@@ -9,7 +9,7 @@ import json
 try:
     from willie import module
 except:
-    module = None
+    pass
 
 def getTicker(name):
     url = "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
@@ -146,12 +146,12 @@ def runMe(bot, tickers, arg):
             out = 'Latest {0} quote is: {1} ({2}%)'.format(ticker, latest, percentage)
             output(bot, out)
 
-    if len(totalPercentage) > 1:
-        out = 'Average change: {0:.2f}%'.format(sum(totalPercentage)/float(len(totalPercentage)))
-        output(bot, out)
+    #if len(totalPercentage) > 1:
+    #    out = 'Average change: {0:.2f}%'.format(sum(totalPercentage)/float(len(totalPercentage)))
+    #    output(bot, out)
 
 try:
-    @module.commands('yf')
+    @module.commands('ef')
     def yf(bot, trigger):    
         tickers = trigger.group(3)
         arg = trigger.group(4)
