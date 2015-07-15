@@ -100,7 +100,7 @@ def formatPercentage(percentage):
         if percentage < 0:
             pf = formatting.color(pf, formatting.colors.RED)
         elif percentage > 0:
-            pf = formatting.color('+' + pf, formatting.colors.GREEN)
+            pf = formatting.color(pf, formatting.colors.GREEN)
 
     pf = '(' + pf + ')'    
 
