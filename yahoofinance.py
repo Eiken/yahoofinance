@@ -92,11 +92,17 @@ def output(bot, out):
 
 def formatPercentage(percentage):
     pf = '{0:.2f}%'.format(percentage)
+
+    if percentage > 0:
+        pf = '+' + pf
+
     if formatting:
         if percentage < 0:
-            pf = '(' + formatting.color(pf, formatting.colors.RED) + ')'
+            pf = formatting.color(pf, formatting.colors.RED)
         elif percentage > 0:
-            pf = '(' + formatting.color('+' + pf, formatting.colors.GREEN) + ')'
+            pf = formatting.color('+' + pf, formatting.colors.GREEN)
+
+    pf = '(' + pf + ')'    
 
     return pf
 
@@ -198,8 +204,8 @@ def test():
 
     #arg = '3m'
     #arg = '1y'
-    arg = '15d'
-    #arg = None
+    #arg = '15d'
+    arg = None
     #arg = '3d'
 
     runMe(None, tickers, arg)
