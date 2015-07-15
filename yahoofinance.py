@@ -14,7 +14,6 @@ except:
 def getTicker(name):
     url = "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
     response = requests.get(url)
-    #print response.content
     html = response.content.lstrip("YAHOO.Finance.SymbolSuggest.ssCallback(").rstrip(")")
     data = json.loads(html)
     result = data.get('ResultSet').get('Result')
@@ -22,11 +21,11 @@ def getTicker(name):
         #try to find swedish stocks first
         for r in result:
             if r.get('exch') == 'STO':
-                return r.get('symbol')
+                return r.get('symbol'), r.get('name')
 
-        return result[0].get('symbol')
+        return result[0].get('symbol'), result[0].get('name')
     else:
-        return None
+        return None, None
 
 
 def getCurrentQuote(ticker):
@@ -45,7 +44,6 @@ def getCurrentQuote(ticker):
         return None, None
 
     latest = quote.get('LastTradePriceOnly')
-#    print quote
     if latest:
         latest = float(latest)
         change = float(quote.get('Change'))
@@ -129,28 +127,25 @@ def runMe(bot, tickers, arg):
             endDateString = endDate.strftime("%Y-%m-%d")
 
 
+            ticker, name = getTicker(ticker)
             latest, old, percentage = getQuoteForRange(ticker, startDateString, endDateString)
-            if not latest:
-                ticker = getTicker(ticker)
-                latest, old, percentage = getQuoteForRange(ticker, startDateString, endDateString)
+
             if percentage:
                 totalPercentage.append(percentage)
             else:
                 percentage = 0.0
-            out = "{0} period quote: startdate: {1}; quote: {2}, enddate {3}; quote {4}. change: ({5:.2f}%)".format(ticker, startDateString, old, endDateString, latest, percentage)
+            out = "{0} ({6}) period quote: startdate: {1}; quote: {2}, enddate {3}; quote {4}. change: ({5:.2f}%)".format(name, startDateString, old, endDateString, latest, percentage, ticker)
             output(bot, out)         
 
         else:
+            ticker, name = getTicker(ticker)
             latest, percentage = getCurrentQuote(ticker)
-            if not latest:
-                ticker = getTicker(ticker)
-                latest, percentage = getCurrentQuote(ticker)
             if percentage:
                 totalPercentage.append(percentage)
             else:
                 percentage = 0.0
 
-            out = 'Latest {0} quote is: {1} ({2:.2f}%)'.format(ticker, latest, percentage)
+            out = 'Latest {0} ({3}) quote is: {1} ({2:.2f}%)'.format(name, latest, percentage, ticker)
             output(bot, out)
 
     #if len(totalPercentage) > 1:
