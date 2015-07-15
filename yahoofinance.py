@@ -91,12 +91,12 @@ def output(bot, out):
         print out
 
 def formatPercentage(percentage):
-    pf = '({0:.2f}%)'.format(percentage)
+    pf = '{0:.2f}%'.format(percentage)
     if formatting:
         if percentage < 0:
-            pf = formatting.color(pf, formatting.colors.RED)
+            pf = '(' + formatting.color(pf, formatting.colors.RED) + ')'
         elif percentage > 0:
-            pf = formatting.color('+' + pf, formatting.colors.GREEN)
+            pf = '(' + formatting.color('+' + pf, formatting.colors.GREEN) + ')'
 
     return pf
 
