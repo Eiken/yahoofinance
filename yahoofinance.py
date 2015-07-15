@@ -191,6 +191,12 @@ try:
         tickers = trigger.group(3)
         arg = trigger.group(4)
         runMe(bot, tickers, arg)
+
+    @module.commands('tjena')
+    def yf(bot, trigger):    
+        tickers = ['omxs30']
+        arg = '1m'
+        runMe(bot, tickers, arg)
 except:
     #module not available
     pass
