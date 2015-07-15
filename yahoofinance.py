@@ -194,7 +194,7 @@ try:
 
     @module.commands('tjena')
     def yf(bot, trigger):    
-        tickers = ['omxs30']
+        tickers = 'omxs30'
         arg = '1m'
         runMe(bot, tickers, arg)
 except:
