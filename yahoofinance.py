@@ -8,8 +8,11 @@ import json
 
 try:
     from willie import module
+    from willie import formatting
 except:
-    pass
+    module = None
+    formatting = None
+
 
 def getTicker(name):
     url = "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
@@ -134,7 +137,11 @@ def runMe(bot, tickers, arg):
                 totalPercentage.append(percentage)
             else:
                 percentage = 0.0
-            out = "{0} ({6}) period quote: startdate: {1}; quote: {2}, enddate {3}; quote {4}. change: ({5:.2f}%)".format(name, startDateString, old, endDateString, latest, percentage, ticker)
+
+            out = '{0} '.format(name)
+            if formatting:
+                out = formatting.bold(out)
+            out += "({5}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ({4:.2f}%)".format(startDateString, old, endDateString, latest, percentage, ticker)
             output(bot, out)         
 
         else:
@@ -144,8 +151,10 @@ def runMe(bot, tickers, arg):
                 totalPercentage.append(percentage)
             else:
                 percentage = 0.0
-
-            out = 'Latest {0} ({3}) quote is: {1} ({2:.2f}%)'.format(name, latest, percentage, ticker)
+            out = '{0} '.format(name)
+            if formatting:
+                out = formatting.bold(out)
+            out += '({2}) quote is: {0} ({1:.2f}%)'.format(latest, percentage, ticker)
             output(bot, out)
 
     #if len(totalPercentage) > 1:
