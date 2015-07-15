@@ -90,6 +90,16 @@ def output(bot, out):
     else:
         print out
 
+def formatPercentage(percentage):
+    pf = '({0:.2f}%)'.format(percentage)
+    if formatting:
+        if percentage < 0:
+            pf = formatting.color(pf, formatting.colors.RED)
+        elif percentage > 0:
+            pf = formatting.color(pf, formatting.colors.GREEN)
+
+    return pf
+
 def runMe(bot, tickers, arg):
     if not tickers:
         output(bot, "No arguments passed")
@@ -141,7 +151,8 @@ def runMe(bot, tickers, arg):
             out = '{0} '.format(name)
             if formatting:
                 out = formatting.bold(out)
-            out += "({5}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ({4:.2f}%)".format(startDateString, old, endDateString, latest, percentage, ticker)
+            out += "({4}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ".format(startDateString, old, endDateString, latest, ticker)
+            out += formatPercentage(percentage)
             output(bot, out)         
 
         else:
@@ -152,9 +163,12 @@ def runMe(bot, tickers, arg):
             else:
                 percentage = 0.0
             out = '{0} '.format(name)
+            
             if formatting:
                 out = formatting.bold(out)
-            out += '({2}) quote is: {0} ({1:.2f}%)'.format(latest, percentage, ticker)
+            out += '({1}) quote is: {0} '.format(latest, ticker)
+            out += formatPercentage(percentage)
+            
             output(bot, out)
 
     #if len(totalPercentage) > 1:
