@@ -34,7 +34,7 @@ def getTicker(name):
 def getCurrentQuote(ticker):
     url = 'https://query.yahooapis.com/v1/public/yql?'
     q = {
-        'q': 'select * from yahoo.finance.quote where symbol in ("{0}")'.format(ticker),
+        'q': 'select * from yahoo.finance.quotes where symbol in ("{0}")'.format(ticker),
         'format': 'json',
         'env': 'store://datatables.org/alltableswithkeys'
     }
@@ -53,11 +53,12 @@ def getCurrentQuote(ticker):
         o = latest - change
         percentage = (latest / o) - 1.0
         percentage *= 100.0
-        
+        currency = quote.get('Currency')
     else:
         percentage = None
+        currency = None
 
-    return latest, percentage
+    return latest, percentage, currency
 
 
 def getQuoteForRange(ticker, start, end):
@@ -168,14 +169,14 @@ def runMe(bot, tickers, arg):
 
         else:
             ticker, name = getTicker(ticker)
-            latest, percentage = getCurrentQuote(ticker)
+            latest, percentage, currency = getCurrentQuote(ticker)
             if percentage:
                 totalPercentage.append(percentage)
             else:
                 percentage = 0.0
             
             out = formatName(name)
-            out += '({1}) quote is: {0} '.format(latest, ticker)
+            out += '({1}) quote is: {0} {2} '.format(latest, ticker, currency)
             out += formatPercentage(percentage)
             
             output(bot, out)
@@ -204,9 +205,9 @@ def test():
 
     #arg = '3m'
     #arg = '1y'
-    #arg = '15d'
-    arg = None
-    #arg = '3d'
+    #arg = yt'15d'
+    #arg = None
+    arg = '3d'
 
     runMe(None, tickers, arg)
 
