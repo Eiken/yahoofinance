@@ -193,7 +193,7 @@ try:
         runMe(bot, tickers, arg)
 
     @module.commands('tjena')
-    def yf(bot, trigger):    
+    def tjena(bot, trigger):    
         tickers = 'omxs30'
         arg = '1m'
         runMe(bot, tickers, arg)
