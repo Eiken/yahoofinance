@@ -100,6 +100,13 @@ def formatPercentage(percentage):
 
     return pf
 
+def formatName(name):
+    out = '{0} '.format(name)
+    if formatting:
+        out = formatting.bold(out)
+    return out
+
+
 def runMe(bot, tickers, arg):
     if not tickers:
         output(bot, "No arguments passed")
@@ -148,9 +155,7 @@ def runMe(bot, tickers, arg):
             else:
                 percentage = 0.0
 
-            out = '{0} '.format(name)
-            if formatting:
-                out = formatting.bold(out)
+            out = formatName(name)
             out += "({4}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ".format(startDateString, old, endDateString, latest, ticker)
             out += formatPercentage(percentage)
             output(bot, out)         
@@ -162,10 +167,8 @@ def runMe(bot, tickers, arg):
                 totalPercentage.append(percentage)
             else:
                 percentage = 0.0
-            out = '{0} '.format(name)
             
-            if formatting:
-                out = formatting.bold(out)
+            out = formatName(name)
             out += '({1}) quote is: {0} '.format(latest, ticker)
             out += formatPercentage(percentage)
             
@@ -189,14 +192,14 @@ def test():
     #tickers = 'PRIC-B.ST'
     #tickers = 'G5EN.ST'
     #tickers = 'G5EN.ST,PRIC-B.ST'
-    tickers = 'apple,pricer'
+    #tickers = 'apple,pricer'
     tickers = 'microsoft,fingerprint,pricer'
-    tickers = 'pricer,bahnhof'
+    #tickers = 'pricer,bahnhof'
 
     #arg = '3m'
     #arg = '1y'
-    #arg = '15d'
-    arg = None
+    arg = '15d'
+    #arg = None
     #arg = '3d'
 
     runMe(None, tickers, arg)
