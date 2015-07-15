@@ -162,7 +162,7 @@ def runMe(bot, tickers, arg):
     #    output(bot, out)
 
 try:
-    @module.commands('ef')
+    @module.commands('yf')
     def yf(bot, trigger):    
         tickers = trigger.group(3)
         arg = trigger.group(4)
