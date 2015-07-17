@@ -154,36 +154,38 @@ def runMe(bot, tickers, arg):
     tickers = tickers.split(',')
     totalPercentage = []
 
+    if arg is not None:
+        days = re.findall('(\d+)(d)', arg) 
+        months = re.findall('(\d+)(m)', arg) 
+        years = re.findall('(\d+)(y)', arg) 
+
+        endDate = datetime.now()
+
+        if years:
+            years = int(years[0][0])
+        else:
+            years = 0
+
+        if months:
+            months = int(months[0][0])
+        else:
+            months = 0
+
+        if days:
+            days = int(days[0][0])
+        else:
+            days = 0
+
+        timeDelta = timedelta(days=days + months * 30 + years * 365)
+
+        startDate = endDate - timeDelta
+
+        startDateString = startDate.strftime("%Y-%m-%d")
+        endDateString = endDate.strftime("%Y-%m-%d")
+
     for ticker in tickers:
 
         if arg is not None:
-            days = re.findall('(\d+)(d)', arg) 
-            months = re.findall('(\d+)(m)', arg) 
-            years = re.findall('(\d+)(y)', arg) 
-
-            endDate = datetime.now()
-
-            if years:
-                years = int(years[0][0])
-            else:
-                years = 0
-
-            if months:
-                months = int(months[0][0])
-            else:
-                months = 0
-
-            if days:
-                days = int(days[0][0])
-            else:
-                days = 0
-
-            timeDelta = timedelta(days=days + months * 30 + years * 365)
-
-            startDate = endDate - timeDelta
-
-            startDateString = startDate.strftime("%Y-%m-%d")
-            endDateString = endDate.strftime("%Y-%m-%d")
 
 
             ticker, name = getTicker(ticker)
@@ -219,9 +221,19 @@ def runMe(bot, tickers, arg):
 
 try:
     @module.commands('yf')
-    def yf(bot, trigger):    
-        tickers = trigger.group(3)
-        arg = trigger.group(4)
+    def yf(bot, trigger):
+        args = trigger.group(2)
+        splitargs = args.split(' ')
+
+        if re.search('\d+d|\d+m|\d+y', splitargs[-1]):
+            arg = splitargs[-1]
+            tickers = ' '.join(splitargs[:-1])
+        else:
+            arg = None
+            tickers = ' '.join(splitargs)
+        
+        #tickers = trigger.group(3)
+        #arg = trigger.group(4)
         runMe(bot, tickers, arg)
 
     @module.commands('eursek')
@@ -259,7 +271,7 @@ def test():
     #tickers = 'apple,pricer'
     tickers = 'microsoft,fingerprint,pricer'
     #tickers = 'pricer,bahnhof'
-    tickers = 'tlsn'
+    tickers = 'omx stockholm 30 index'
 
     #arg = '3m'
     #arg = '1y'
