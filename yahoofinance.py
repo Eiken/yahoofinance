@@ -28,13 +28,13 @@ def getTicker(name, gimme=False):
     results = []
     if result:
         if gimme is True:
-            for r in result:
+            for r in sorted(result, key=lambda x: x.get('typeDisp')):
                 results.append([r.get('symbol'), r.get('name')])
 
             return results       
         else:
             #try to find swedish stocks first
-            for r in result:
+            for r in sorted(result, key=lambda x: x.get('typeDisp')):
                 if r.get('exch') == 'STO':
                     return r.get('symbol'), r.get('name')
 
@@ -259,18 +259,19 @@ def test():
     #tickers = 'apple,pricer'
     tickers = 'microsoft,fingerprint,pricer'
     #tickers = 'pricer,bahnhof'
+    tickers = 'tlsn'
 
     #arg = '3m'
     #arg = '1y'
     #arg = yt'15d'
-    #arg = None
-    arg = '3d'
+    arg = None
+    #arg = '3d'
 
     runMe(None, tickers, arg)
 
 def test2():
-    res = findTickers(None, 'fortum')
+    res = findTickers(None, 'tlsn')
 
 if __name__ == "__main__":
-    #test()
-    test2()
+    test()
+    #test2()
