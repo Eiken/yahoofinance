@@ -220,16 +220,30 @@ try:
         arg = trigger.group(4)
         runMe(bot, tickers, arg)
 
-    @module.commands('tjena')
-    def tjena(bot, trigger):    
-        tickers = 'omxs30'
-        arg = '1m'
+    @module.commands('eursek')
+    def eursek(bot, trigger):    
+        tickers = 'eursek=x'
+        arg = None
+        runMe(bot, tickers, arg)
+
+    @module.commands('usdsek')
+    def usdsek(bot, trigger):    
+        tickers = 'usdsek=x'
+        arg = None
+        runMe(bot, tickers, arg)
+
+    @module.commands('eurusd')
+    def eurusd(bot, trigger):    
+        tickers = 'eurusd=x'
+        arg = None
         runMe(bot, tickers, arg)
 
     @module.commands('yfind')
     def yfind(bot, trigger):    
         ticker = trigger.group(2)
         findTickers(bot, ticker)
+
+
 except:
     #module not available
     pass
