@@ -6,3 +6,5 @@ Features:
 *Current stock quote
 
 *Historical quote over period specified in y,m,d
+
+*Search tickers by name
