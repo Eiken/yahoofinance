@@ -13,22 +13,54 @@ except:
     module = None
     formatting = None
 
+def output(bot, out):
+    if bot is not None:
+        bot.say(out)
+    else:
+        print out
 
-def getTicker(name):
+def getTicker(name, gimme=False):
     url = "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
     response = requests.get(url)
     html = response.content.lstrip("YAHOO.Finance.SymbolSuggest.ssCallback(").rstrip(")")
     data = json.loads(html)
     result = data.get('ResultSet').get('Result')
+    results = []
     if result:
-        #try to find swedish stocks first
-        for r in result:
-            if r.get('exch') == 'STO':
-                return r.get('symbol'), r.get('name')
+        if gimme is True:
+            for r in result:
+                results.append([r.get('symbol'), r.get('name')])
 
-        return result[0].get('symbol'), result[0].get('name')
+            return results       
+        else:
+            #try to find swedish stocks first
+            for r in result:
+                if r.get('exch') == 'STO':
+                    return r.get('symbol'), r.get('name')
+
+            return result[0].get('symbol'), result[0].get('name')
     else:
         return None, None
+
+
+
+
+def findTickers(bot, ticker, maxresult=5):
+    res = getTicker(ticker, gimme=True)
+    out = 'Found {0} tickers. Max result is {1}.'.format(len(res), maxresult)
+    output(bot, out)
+    count = 0
+    for r in res:
+        if count == maxresult:
+            break
+        out = r[1]
+        if formatting:
+            out = formatting.bold(out)
+
+        out += ' ({0})'.format(r[0])
+
+        output(bot, out)
+        count += 1
 
 
 def getCurrentQuote(ticker):
@@ -85,11 +117,7 @@ def getQuoteForRange(ticker, start, end):
             return latest, old, percentage
     return None, None, None
 
-def output(bot, out):
-    if bot is not None:
-        bot.say(out)
-    else:
-        print out
+
 
 def formatPercentage(percentage):
     pf = '{0:.2f}%'.format(percentage)
@@ -197,6 +225,11 @@ try:
         tickers = 'omxs30'
         arg = '1m'
         runMe(bot, tickers, arg)
+
+    @module.commands('yfind')
+    def yfind(bot, trigger):    
+        ticker = trigger.group(2)
+        findTickers(bot, ticker)
 except:
     #module not available
     pass
@@ -217,5 +250,9 @@ def test():
 
     runMe(None, tickers, arg)
 
+def test2():
+    res = findTickers(None, 'fortum')
+
 if __name__ == "__main__":
-    test()
+    #test()
+    test2()
