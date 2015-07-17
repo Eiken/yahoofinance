@@ -26,15 +26,21 @@ def getTicker(name, gimme=False):
     data = json.loads(html)
     result = data.get('ResultSet').get('Result')
     results = []
+    sortOrder = {}
+    sortOrder['Index'] = 0
+    sortOrder['Equity'] = 1
+    sortOrder['Futures'] = 2
+    sortOrder['ETF'] = 3
+
     if result:
         if gimme is True:
-            for r in sorted(result, key=lambda x: x.get('typeDisp')):
-                results.append([r.get('symbol'), r.get('name')])
+            for r in sorted(result, key=lambda x: sortOrder.get(x.get('typeDisp'), 999)):
+                results.append([r.get('symbol'), r.get('name'), r.get('typeDisp')])
 
             return results       
         else:
             #try to find swedish stocks first
-            for r in sorted(result, key=lambda x: x.get('typeDisp')):
+            for r in sorted(result, key=lambda x: sortOrder.get(x.get('typeDisp'), 999)):
                 if r.get('exch') == 'STO':
                     return r.get('symbol'), r.get('name')
 
@@ -62,6 +68,7 @@ def findTickers(bot, ticker, maxresult=5):
             out = formatting.bold(out)
 
         out += ' ({0})'.format(r[0])
+        out += ' of type {0}'.format(r[2])
 
         output(bot, out)
         count += 1
@@ -282,8 +289,9 @@ def test():
     runMe(None, tickers, arg)
 
 def test2():
-    res = findTickers(None, 'tlsn')
+    da = 'omxs30'
+    res = findTickers(None, da, maxresult=20)
 
 if __name__ == "__main__":
-    test()
-    #test2()
+    #test()
+    test2()
