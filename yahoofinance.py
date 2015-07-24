@@ -92,7 +92,11 @@ def getCurrentQuote(ticker):
     latest = quote.get('LastTradePriceOnly')
     if latest:
         latest = float(latest)
-        change = float(quote.get('Change'))
+        change = quote.get('Change')
+        if change:
+            change = float(change)
+        else:
+            change = 0.0
         o = latest - change
         percentage = (latest / o) - 1.0
         percentage *= 100.0
@@ -278,7 +282,7 @@ def test():
     #tickers = 'apple,pricer'
     tickers = 'microsoft,fingerprint,pricer'
     #tickers = 'pricer,bahnhof'
-    tickers = 'omx stockholm 30 index'
+    tickers = 'cur'
 
     #arg = '3m'
     #arg = '1y'
@@ -293,5 +297,5 @@ def test2():
     res = findTickers(None, da, maxresult=20)
 
 if __name__ == "__main__":
-    #test()
-    test2()
+    test()
+    #test2()
