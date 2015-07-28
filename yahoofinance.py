@@ -270,6 +270,13 @@ try:
         ticker = trigger.group(2)
         findTickers(bot, ticker)
 
+    @module.commands('newbie')
+    def newbie(bot, trigger):    
+        tickers = ['USDSEK=X','EURSEK=X','SEKTHB=X','gcn15','clu15']
+        arg = None
+        for ticker in tickers:
+            runMe(bot, ticker, arg)
+
 
 except:
     #module not available
