@@ -193,12 +193,16 @@ def runMe(bot, tickers, arg):
         startDateString = startDate.strftime("%Y-%m-%d")
         endDateString = endDate.strftime("%Y-%m-%d")
 
+        timeDelta2 = timedelta(days=30)
+        endDate2 = startDate + timeDelta2
+        endDateString2 = endDate2.strftime("%Y-%m-%d")
+
     for ticker in tickers:
         ticker, name = getTicker(ticker)
         latest, percentage, currency = getCurrentQuote(ticker)
 
         if arg is not None:
-            old = getQuoteForRange(ticker, startDateString, endDateString)
+            old = getQuoteForRange(ticker, startDateString, endDateString2)
 
             if old:
                 percentage = (latest - old) / old
@@ -280,9 +284,9 @@ def test():
     #tickers = 'microsoft,fingerprint,pricer'
     #tickers = 'pricer,bahnhof'
     #tickers = 'cur'
-    tickers = 'pricer'
+    tickers = 'latour'
 
-    arg = '3m'
+    arg = '12m'
     #arg = '1y'
     #arg = yt'15d'
     #arg = None
