@@ -119,19 +119,18 @@ def getQuoteForRange(ticker, start, end):
     result = requests.get(query)
     dic = json.loads(result.content)
     results = dic.get('query').get('results')
-    if results:
+
+    old = None
+
+    if results is not None:
         quoteList = results.get('quote')
 
         if not type(quoteList) is dict:
-            latest = float(quoteList[0].get('Close'))
             old = float(quoteList[-1].get('Close'))    
-
-            percentage = (latest - old) / old
-            percentage *= 100.0
-
-            return latest, old, percentage
-    return None, None, None
-
+        else:
+            old = float(quoteList.get('Close'))  
+            
+    return old
 
 
 def formatPercentage(percentage):
@@ -195,40 +194,31 @@ def runMe(bot, tickers, arg):
         endDateString = endDate.strftime("%Y-%m-%d")
 
     for ticker in tickers:
+        ticker, name = getTicker(ticker)
+        latest, percentage, currency = getCurrentQuote(ticker)
 
         if arg is not None:
+            old = getQuoteForRange(ticker, startDateString, endDateString)
 
+            if old:
+                percentage = (latest - old) / old
+                percentage *= 100.0
 
-            ticker, name = getTicker(ticker)
-            latest, old, percentage = getQuoteForRange(ticker, startDateString, endDateString)
+                out = formatName(name)
+                out += "({4}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ".format(startDateString, old, endDateString, latest, ticker)
+                out += formatPercentage(percentage)
+                output(bot, out)         
+                return
 
-            if percentage:
-                totalPercentage.append(percentage)
-            else:
-                percentage = 0.0
-
-            out = formatName(name)
-            out += "({4}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ".format(startDateString, old, endDateString, latest, ticker)
-            out += formatPercentage(percentage)
-            output(bot, out)         
-
-        else:
-            ticker, name = getTicker(ticker)
-            latest, percentage, currency = getCurrentQuote(ticker)
-            if percentage:
-                totalPercentage.append(percentage)
-            else:
-                percentage = 0.0
-            
-            out = formatName(name)
-            out += '({1}) quote is: {0} {2} '.format(latest, ticker, currency)
-            out += formatPercentage(percentage)
-            
-            output(bot, out)
-
-    #if len(totalPercentage) > 1:
-    #    out = 'Average change: {0:.2f}%'.format(sum(totalPercentage)/float(len(totalPercentage)))
-    #    output(bot, out)
+           
+        if not percentage:
+            percentage = 0.0
+        
+        out = formatName(name)
+        out += '({1}) quote is: {0} {2} '.format(latest, ticker, currency)
+        out += formatPercentage(percentage)
+        
+        output(bot, out)
 
 try:
     @module.commands('yf')
@@ -287,14 +277,15 @@ def test():
     #tickers = 'G5EN.ST'
     #tickers = 'G5EN.ST,PRIC-B.ST'
     #tickers = 'apple,pricer'
-    tickers = 'microsoft,fingerprint,pricer'
+    #tickers = 'microsoft,fingerprint,pricer'
     #tickers = 'pricer,bahnhof'
-    tickers = 'cur'
+    #tickers = 'cur'
+    tickers = 'pricer'
 
-    #arg = '3m'
+    arg = '3m'
     #arg = '1y'
     #arg = yt'15d'
-    arg = None
+    #arg = None
     #arg = '3d'
 
     runMe(None, tickers, arg)
