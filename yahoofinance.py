@@ -241,15 +241,21 @@ try:
         #arg = trigger.group(4)
         runMe(bot, tickers, arg)
 
-    @module.commands('eursek')
+    @module.commands('eur')
     def eursek(bot, trigger):    
         tickers = 'eursek=x'
         arg = None
         runMe(bot, tickers, arg)
 
-    @module.commands('usdsek')
+    @module.commands('usd')
     def usdsek(bot, trigger):    
         tickers = 'usdsek=x'
+        arg = None
+        runMe(bot, tickers, arg)
+
+    @module.commands('aud')
+    def eursek(bot, trigger):    
+        tickers = 'audsek=x'
         arg = None
         runMe(bot, tickers, arg)
 
