@@ -254,7 +254,7 @@ try:
         runMe(bot, tickers, arg)
 
     @module.commands('aud')
-    def eursek(bot, trigger):    
+    def audsek(bot, trigger):    
         tickers = 'audsek=x'
         arg = None
         runMe(bot, tickers, arg)
