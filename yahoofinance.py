@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import requests
 import urllib
 import sys
@@ -150,7 +152,7 @@ def formatPercentage(percentage):
     return pf
 
 def formatName(name):
-    out = '{0} '.format(name)
+    out = u'{0} '.format(name)
     if formatting:
         out = formatting.bold(out)
     return out
@@ -290,7 +292,7 @@ def test():
     #tickers = 'microsoft,fingerprint,pricer'
     #tickers = 'pricer,bahnhof'
     #tickers = 'cur'
-    tickers = 'latour'
+    tickers = 'indu-c'
 
     arg = '12m'
     #arg = '1y'
