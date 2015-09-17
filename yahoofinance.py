@@ -15,15 +15,24 @@ except:
     module = None
     formatting = None
 
-def output(bot, out):
-    if bot is not None:
-        bot.say(out)
+botten = None
+
+def output(out):
+    global botten
+    if botten is not None:
+        botten.say(out)
     else:
         print out
 
 def getTicker(name, gimme=False):
     url = "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
-    response = requests.get(url)
+
+    try:
+        response = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        output("Failed to connect to yahoo")
+        return None, None
+
     html = response.content.lstrip("YAHOO.Finance.SymbolSuggest.ssCallback(").rstrip(")")
     data = json.loads(html)
     result = data.get('ResultSet').get('Result')
@@ -57,10 +66,10 @@ def findTickers(bot, ticker, maxresult=5):
     res = getTicker(ticker, gimme=True)
     if res[0] is None:
         out = 'Found no tickers'
-        output(bot, out)
+        output(out)
         return
     out = 'Found {0} tickers. Max result is {1}.'.format(len(res), maxresult)
-    output(bot, out)
+    output(out)
     count = 0
     for r in res:
         if count == maxresult:
@@ -72,7 +81,7 @@ def findTickers(bot, ticker, maxresult=5):
         out += ' ({0})'.format(r[0])
         out += ' of type {0}'.format(r[2])
 
-        output(bot, out)
+        output(out)
         count += 1
 
 
@@ -85,11 +94,17 @@ def getCurrentQuote(ticker):
     }
 
     query = url + urllib.urlencode(q)
-    result = requests.get(query)
+    try:
+        result = requests.get(query)
+    except requests.exceptions.RequestException as e:
+        output("Failed to connect to yahoo")
+        return None, None, None
+
+        
     dic = json.loads(result.content)
     quote = dic.get('query').get('results').get('quote')
     if type(quote)  == list:
-        return None, None
+        return None, None, None
 
     latest = quote.get('LastTradePriceOnly')
     if latest:
@@ -119,6 +134,13 @@ def getQuoteForRange(ticker, start, end):
     }
     query = url + urllib.urlencode(q)
     result = requests.get(query)
+
+    try:
+        result = requests.get(query)
+    except requests.exceptions.RequestException as e:
+        output("Failed to connect to yahoo")
+        return None
+
     dic = json.loads(result.content)
     results = dic.get('query').get('results')
 
@@ -158,9 +180,9 @@ def formatName(name):
     return out
 
 
-def runMe(bot, tickers, arg):
+def runMe(tickers, arg=None):
     if not tickers:
-        output(bot, "No arguments passed")
+        output("No arguments passed")
         return
 
     tickers = tickers.split(',')
@@ -213,7 +235,7 @@ def runMe(bot, tickers, arg):
                 out = formatName(name)
                 out += "({4}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ".format(startDateString, old, endDateString, latest, ticker)
                 out += formatPercentage(percentage)
-                output(bot, out)         
+                output(out)         
                 return
 
            
@@ -224,7 +246,7 @@ def runMe(bot, tickers, arg):
         out += '({1}) quote is: {0} {2} '.format(latest, ticker, currency)
         out += formatPercentage(percentage)
         
-        output(bot, out)
+        output(out)
 
 try:
     @module.commands('yf')
@@ -239,45 +261,52 @@ try:
             arg = None
             tickers = ' '.join(splitargs)
         
-        #tickers = trigger.group(3)
-        #arg = trigger.group(4)
-        runMe(bot, tickers, arg)
+        global botten
+        botten = bot
+        runMe(tickers, arg)
 
     @module.commands('eur')
     def eursek(bot, trigger):    
         tickers = 'eursek=x'
-        arg = None
-        runMe(bot, tickers, arg)
+        global botten
+        botten = bot
+        runMe(tickers)
 
     @module.commands('usd')
     def usdsek(bot, trigger):    
         tickers = 'usdsek=x'
-        arg = None
-        runMe(bot, tickers, arg)
+        global botten
+        botten = bot
+        runMe(tickers)
 
     @module.commands('aud')
     def audsek(bot, trigger):    
         tickers = 'audsek=x'
-        arg = None
-        runMe(bot, tickers, arg)
+        global botten
+        botten = bot
+        runMe(tickers)
 
     @module.commands('eurusd')
     def eurusd(bot, trigger):    
         tickers = 'eurusd=x'
-        arg = None
-        runMe(bot, tickers, arg)
+        global botten
+        botten = bot
+        runMe(tickers)
 
     @module.commands('yfind')
     def yfind(bot, trigger):    
+        global botten
+        botten = bot
         ticker = trigger.group(2)
-        findTickers(bot, ticker)
+        findTickers(ticker)
 
     @module.commands('newbie')
-    def newbie(bot, trigger):    
+    def newbie(bot, trigger):
+        global botten
+        botten = bot
         tickers = ['USDSEK=X','EURSEK=X','SEKTHB=X','gcn15','clu15']
-        arg = None
         for ticker in tickers:
-            runMe(bot, ticker, arg)
+            runMe(ticker)
 
 
 except:
@@ -292,19 +321,20 @@ def test():
     #tickers = 'microsoft,fingerprint,pricer'
     #tickers = 'pricer,bahnhof'
     #tickers = 'cur'
-    tickers = 'indu-c'
+    #tickers = 'indu-c'
+    tickers = 'hm-b,ua'
 
-    arg = '12m'
+    #arg = '12m'
     #arg = '1y'
     #arg = yt'15d'
-    #arg = None
+    arg = None
     #arg = '3d'
 
-    runMe(None, tickers, arg)
+    runMe(tickers, arg)
 
 def test2():
     da = 'omxs30'
-    res = findTickers(None, da, maxresult=20)
+    res = findTickers(da, maxresult=20)
 
 if __name__ == "__main__":
     test()
