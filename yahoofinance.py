@@ -62,7 +62,7 @@ def getTicker(name, gimme=False):
 
 
 
-def findTickers(bot, ticker, maxresult=5):
+def findTickers(ticker, maxresult=5):
     res = getTicker(ticker, gimme=True)
     if res[0] is None:
         out = 'Found no tickers'
