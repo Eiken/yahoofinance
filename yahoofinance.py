@@ -25,7 +25,8 @@ def output(out):
         print out
 
 def getTicker(name, gimme=False):
-    name = name.decode('utf-8')
+    if not type(name) is unicode:
+        name = name.decode('utf-8')
     url = u"http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
 
     try:
@@ -324,7 +325,7 @@ def test():
     #tickers = 'cur'
     #tickers = 'indu-c'
     tickers = 'hm-b,ua'
-    tickers = 'öb'
+    tickers = 'företagen'
 
     #arg = '12m'
     #arg = '1y'
