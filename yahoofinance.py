@@ -25,7 +25,8 @@ def output(out):
         print out
 
 def getTicker(name, gimme=False):
-    url = "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
+    name = name.decode('utf-8')
+    url = u"http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
 
     try:
         response = requests.get(url)
@@ -323,6 +324,7 @@ def test():
     #tickers = 'cur'
     #tickers = 'indu-c'
     tickers = 'hm-b,ua'
+    tickers = 'öb'
 
     #arg = '12m'
     #arg = '1y'
