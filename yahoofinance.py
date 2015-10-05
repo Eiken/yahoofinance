@@ -27,7 +27,9 @@ def output(out):
 def getTicker(name, gimme=False):
     if not type(name) is unicode:
         name = name.decode('utf-8')
-    url = u"http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
+
+    #url = u"http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
+    url = u"https://s.yimg.com/aq/autoc?query={0}&region=CA&lang=en-CA&callback=YAHOO.util.ScriptNodeDataSource.callbacks".format(name)
 
     try:
         response = requests.get(url)
@@ -35,7 +37,8 @@ def getTicker(name, gimme=False):
         output("Failed to connect to yahoo")
         return None, None
 
-    html = response.content.lstrip("YAHOO.Finance.SymbolSuggest.ssCallback(").rstrip(")")
+    #html = response.content.lstrip("YAHOO.Finance.SymbolSuggest.ssCallback(").rstrip(")")
+    html = response.content.lstrip("YAHOO.util.ScriptNodeDataSource.callbacks(").rstrip(");")
     data = json.loads(html)
     result = data.get('ResultSet').get('Result')
     results = []
@@ -325,7 +328,7 @@ def test():
     #tickers = 'cur'
     #tickers = 'indu-c'
     tickers = 'hm-b,ua'
-    tickers = 'företagen'
+    #tickers = 'företagen'
 
     #arg = '12m'
     #arg = '1y'
