@@ -278,30 +278,9 @@ try:
         botten = bot
         runMe(tickers, arg)
 
-    @module.commands('eur')
-    def eursek(bot, trigger):    
-        tickers = 'eursek=x'
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands('usd')
-    def usdsek(bot, trigger):    
-        tickers = 'usdsek=x'
-        global botten
-        botten = bot
-        runMe(tickers)
-
     @module.commands('aud')
     def audsek(bot, trigger):    
         tickers = 'audsek=x'
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands('eurusd')
-    def eurusd(bot, trigger):    
-        tickers = 'eurusd=x'
         global botten
         botten = bot
         runMe(tickers)
@@ -312,15 +291,6 @@ try:
         botten = bot
         ticker = trigger.group(2)
         findTickers(ticker)
-
-    @module.commands('newbie')
-    def newbie(bot, trigger):
-        global botten
-        botten = bot
-        tickers = ['USDSEK=X','EURSEK=X','SEKTHB=X','gcn15','clu15']
-        for ticker in tickers:
-            runMe(ticker)
-
 
 except:
     #module not available
