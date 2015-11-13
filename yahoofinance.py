@@ -107,6 +107,10 @@ def getCurrentQuote(ticker):
 
         
     dic = json.loads(result.content)
+    if dic is None:
+        output("Failed to connect to yahoo")
+        return None, None, None
+
     quote = dic.get('query').get('results').get('quote')
     if type(quote)  == list:
         return None, None, None
@@ -147,6 +151,10 @@ def getQuoteForRange(ticker, start, end):
         return None
 
     dic = json.loads(result.content)
+    if dic is None:
+        output("Failed to connect to yahoo")
+        return None, None, None
+
     results = dic.get('query').get('results')
 
     old = None
@@ -327,13 +335,13 @@ def test():
     #tickers = 'pricer,bahnhof'
     #tickers = 'cur'
     #tickers = 'indu-c'
-    tickers = 'hm-b,ua'
+    tickers = 'sas.st'
     #tickers = 'företagen'
 
-    #arg = '12m'
+    arg = '12m'
     #arg = '1y'
     #arg = yt'15d'
-    arg = None
+    #arg = None
     #arg = '3d'
 
     runMe(tickers, arg)
