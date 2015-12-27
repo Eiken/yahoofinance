@@ -6,7 +6,7 @@ import requests, json
 from willie import module
 
 # Print difference
-@module.commands('yahoo', 'yahoofinance', 'yf')
+@module.commands('y', 'yahoo', 'yahoofinance', 'yf')
 def ig(bot, trigger):
 
    ticker = trigger.group(2)
