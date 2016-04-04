@@ -89,12 +89,56 @@ def findTickers(ticker, maxresult=5):
         output(out)
         count += 1
 
+def getCurrentQuoteAlternative(ticker):
+    url = 'http://finance.yahoo.com/webservice/v1/symbols/{0}/quote?'.format(ticker)
+    q = {
+        'format': 'json',
+        'view': 'detail',
+    }
+
+    query = url + urllib.urlencode(q)
+    try:
+        result = requests.get(query)
+    except requests.exceptions.RequestException as e:
+        output("Failed to connect to yahoo")
+        return None, None, None
+
+    dic = json.loads(result.content)
+    if dic is None:
+        output("Failed to connect to yahoo")
+        return None, None, None
+    
+    resources = dic.get('list').get('resources')
+    resource = resources[0]
+    quote = resource.get('resource').get('fields')
+
+    latest = quote.get('price')
+    if latest:
+        latest = float(latest)
+        change = quote.get('change')
+        if change:
+            change = float(change)
+        else:
+            change = 0.0
+        o = latest - change
+        percentage = (latest / o) - 1.0
+        percentage *= 100.0
+        #currency = quote.get('Currency')
+        currency = 'SEK'
+    else:
+        percentage = None
+        currency = None
+
+    return latest, percentage, currency
 
 def getCurrentQuote(ticker):
+    #temp use this function
+    #return  getCurrentQuoteAlternative(ticker)
     url = 'https://query.yahooapis.com/v1/public/yql?'
     q = {
         'q': 'select * from yahoo.finance.quotes where symbol in ("{0}")'.format(ticker),
         'format': 'json',
+        'diagnostics': 'true',
         'env': 'store://datatables.org/alltableswithkeys'
     }
 
@@ -302,16 +346,16 @@ def test():
     #tickers = 'G5EN.ST,PRIC-B.ST'
     #tickers = 'apple,pricer'
     #tickers = 'microsoft,fingerprint,pricer'
-    #tickers = 'pricer,bahnhof'
+    tickers = 'pricer,bahnhof'
     #tickers = 'cur'
     #tickers = 'indu-c'
-    tickers = 'sas.st'
+    #tickers = 'sas.st'
     #tickers = 'företagen'
 
-    arg = '12m'
+    #arg = '12m'
     #arg = '1y'
     #arg = yt'15d'
-    #arg = None
+    arg = None
     #arg = '3d'
 
     runMe(tickers, arg)
