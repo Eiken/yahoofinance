@@ -14,6 +14,8 @@ try:
 except:
     module = None
     formatting = None
+    import traceback
+    traceback.print_exc(file=sys.stdout)
 
 botten = None
 
