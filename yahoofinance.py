@@ -307,7 +307,7 @@ def runMe(tickers, arg=None):
         output(out)
 
 try:
-    @module.commands('yf')
+    @module.commands('yf', 'y')
     def yf(bot, trigger):
         args = trigger.group(2)
         splitargs = args.split(' ')
