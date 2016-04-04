@@ -9,8 +9,8 @@ import re
 import json
 
 try:
-    from willie import module
-    from willie import formatting
+    from sopel import module
+    from sopel import formatting
 except:
     module = None
     formatting = None
