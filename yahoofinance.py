@@ -143,6 +143,7 @@ def getCurrentQuote(ticker):
     }
 
     query = url + urllib.urlencode(q)
+    print query
     try:
         result = requests.get(query)
     except requests.exceptions.RequestException as e:
@@ -339,6 +340,8 @@ try:
 
 except:
     #module not available
+    import traceback
+    traceback.print_exc(file=sys.stdout)
     pass
 
 def test():
@@ -353,10 +356,10 @@ def test():
     #tickers = 'sas.st'
     #tickers = 'företagen'
 
-    arg = '12m'
+    #arg = '12m'
     #arg = '1y'
     #arg = yt'15d'
-    #arg = None
+    arg = None
     #arg = '3d'
 
     runMe(tickers, arg)
