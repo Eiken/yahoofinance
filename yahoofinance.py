@@ -183,6 +183,7 @@ def getQuoteForRange(ticker, start, end):
     q = {
         'q': 'select * from yahoo.finance.historicaldata where symbol = "{0}" and startDate = "{1}" and endDate = "{2}"'.format(ticker, start, end),
         'format': 'json',
+        'diagnostics': 'true',
         'env': 'store://datatables.org/alltableswithkeys'
     }
     query = url + urllib.urlencode(q)
@@ -352,10 +353,10 @@ def test():
     #tickers = 'sas.st'
     #tickers = 'företagen'
 
-    #arg = '12m'
+    arg = '12m'
     #arg = '1y'
     #arg = yt'15d'
-    arg = None
+    #arg = None
     #arg = '3d'
 
     runMe(tickers, arg)
