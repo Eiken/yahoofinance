@@ -126,7 +126,7 @@ def getCurrentQuoteAlternative(ticker):
         percentage = (latest / o) - 1.0
         percentage *= 100.0
         #currency = quote.get('Currency')
-        currency = 'SEK'
+        currency = ''
     else:
         percentage = None
         currency = None
@@ -135,7 +135,7 @@ def getCurrentQuoteAlternative(ticker):
 
 def getCurrentQuote(ticker):
     #temp use this function
-    #return  getCurrentQuoteAlternative(ticker)
+    return  getCurrentQuoteAlternative(ticker)
     url = 'https://query.yahooapis.com/v1/public/yql?'
     q = {
         'q': 'select * from yahoo.finance.quotes where symbol in ("{0}")'.format(ticker),
