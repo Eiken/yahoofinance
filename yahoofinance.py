@@ -340,6 +340,12 @@ try:
         ticker = trigger.group(2)
         findTickers(ticker)
 
+    @module.commands('curre', 'kurredutt')
+    def curre(bot, trigger):    
+        global botten
+        botten = bot
+        ticker = 'CUR'
+        runMe(ticker)
 except:
     #module not available
     import traceback
