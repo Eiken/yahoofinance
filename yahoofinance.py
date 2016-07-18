@@ -14,8 +14,8 @@ try:
 except:
     module = None
     formatting = None
-    import traceback
-    traceback.print_exc(file=sys.stdout)
+    #import traceback
+    #traceback.print_exc(file=sys.stdout)
 
 botten = None
 
@@ -135,7 +135,7 @@ def getCurrentQuoteAlternative(ticker):
 
 def getCurrentQuote(ticker):
     #temp use this function
-    return  getCurrentQuoteAlternative(ticker)
+    #return  getCurrentQuoteAlternative(ticker)
     url = 'https://query.yahooapis.com/v1/public/yql?'
     q = {
         'q': 'select * from yahoo.finance.quotes where symbol in ("{0}")'.format(ticker),
@@ -145,7 +145,7 @@ def getCurrentQuote(ticker):
     }
 
     query = url + urllib.urlencode(q)
-    print query
+    #print query
     try:
         result = requests.get(query)
     except requests.exceptions.RequestException as e:
@@ -348,8 +348,8 @@ try:
         runMe(ticker)
 except:
     #module not available
-    import traceback
-    traceback.print_exc(file=sys.stdout)
+    #import traceback
+    #traceback.print_exc(file=sys.stdout)
     pass
 
 def test():
