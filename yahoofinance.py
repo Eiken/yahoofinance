@@ -99,8 +99,12 @@ def getCurrentQuoteAlternative(ticker):
     }
 
     query = url + urllib.urlencode(q)
+    headers = {
+            "User-Agent": 
+            "Mozilla/5.0 (Linux; Android 6.0; MotoE2(4G-LTE) Build/MPI24.65-39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.81 Mobile Safari/537.36"
+            }
     try:
-        result = requests.get(query)
+        result = requests.get(query, headers=headers)
     except requests.exceptions.RequestException as e:
         output("Failed to connect to yahoo")
         return None, None, None
