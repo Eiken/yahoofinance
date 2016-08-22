@@ -139,7 +139,7 @@ def getCurrentQuoteAlternative(ticker):
 
 def getCurrentQuote(ticker):
     #temp use this function
-    #return  getCurrentQuoteAlternative(ticker)
+    return  getCurrentQuoteAlternative(ticker)
     url = 'https://query.yahooapis.com/v1/public/yql?'
     q = {
         'q': 'select * from yahoo.finance.quotes where symbol in ("{0}")'.format(ticker),
@@ -362,7 +362,7 @@ def test():
     #tickers = 'G5EN.ST,PRIC-B.ST'
     #tickers = 'apple,pricer'
     #tickers = 'microsoft,fingerprint,pricer'
-    tickers = 'pricer,bahnhof'
+    tickers = 'pricer,interfox'
     #tickers = 'cur'
     #tickers = 'indu-c'
     #tickers = 'sas.st'
