@@ -287,29 +287,32 @@ def runMe(tickers, arg=None):
         endDateString2 = endDate2.strftime("%Y-%m-%d")
 
     for ticker in tickers:
-        ticker, name = getTicker(ticker)
-        latest, percentage, currency = getCurrentQuote(ticker)
+        fticker, name = getTicker(ticker)
+        if fticker:
+            latest, percentage, currency = getCurrentQuote(fticker)
 
-        if arg is not None:
-            old = getQuoteForRange(ticker, startDateString, endDateString2)
+            if arg is not None:
+                old = getQuoteForRange(fticker, startDateString, endDateString2)
 
-            if old:
-                percentage = (latest - old) / old
-                percentage *= 100.0
+                if old:
+                    percentage = (latest - old) / old
+                    percentage *= 100.0
 
-                out = formatName(name)
-                out += "({4}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ".format(startDateString, old, endDateString, latest, ticker)
-                out += formatPercentage(percentage)
-                output(out)         
-                return
+                    out = formatName(name)
+                    out += "({4}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ".format(startDateString, old, endDateString, latest, fticker)
+                    out += formatPercentage(percentage)
+                    output(out)         
+                    return
 
-           
-        if not percentage:
-            percentage = 0.0
-        
-        out = formatName(name)
-        out += '({1}) quote is: {0} {2} '.format(latest, ticker, currency)
-        out += formatPercentage(percentage)
+               
+            if not percentage:
+                percentage = 0.0
+            
+            out = formatName(name)
+            out += '({1}) quote is: {0} {2} '.format(latest, fticker, currency)
+            out += formatPercentage(percentage)
+        else:
+            out = 'Found no ticker for ' + formatName(ticker) + ' at yahoo finance'
         
         output(out)
 
