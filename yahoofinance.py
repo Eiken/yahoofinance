@@ -29,6 +29,9 @@ def output(out):
 def getTicker(name, gimme=False):
     if not type(name) is unicode:
         name = name.decode('utf-8')
+    name = name.replace(u'ö', u'o')
+    name = name.replace(u'ä', u'a')
+    name = name.replace(u'å', u'a')
 
     #url = u"http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
     url = u"https://s.yimg.com/aq/autoc?query={0}&region=CA&lang=en-CA&callback=YAHOO.util.ScriptNodeDataSource.callbacks".format(name)
@@ -109,7 +112,7 @@ def getCurrentQuoteAlternative(ticker):
         output("Failed to connect to yahoo")
         return None, None, None
 
-    dic = json.loads(result.content)
+    dic = json.loads(result.content, strict=False)
     if dic is None:
         output("Failed to connect to yahoo")
         return None, None, None
@@ -239,7 +242,7 @@ def formatPercentage(percentage):
     return pf
 
 def formatName(name):
-    out = u'{0} '.format(name)
+    out = u'{0} '.format(name).replace('\n', '')
     if formatting:
         out = formatting.bold(out)
     return out
@@ -312,7 +315,7 @@ def runMe(tickers, arg=None):
             out += '({1}) quote is: {0} {2} '.format(latest, fticker, currency)
             out += formatPercentage(percentage)
         else:
-            out = 'Found no ticker for ' + formatName(ticker) + ' at yahoo finance'
+            out = 'Found no ticker for ' + formatName(ticker) + 'at yahoo finance'
         
         output(out)
 
@@ -365,11 +368,11 @@ def test():
     #tickers = 'G5EN.ST,PRIC-B.ST'
     #tickers = 'apple,pricer'
     #tickers = 'microsoft,fingerprint,pricer'
-    tickers = 'pricer,interfox'
+    #tickers = 'pricer,interfox'
     #tickers = 'cur'
     #tickers = 'indu-c'
     #tickers = 'sas.st'
-    #tickers = 'företagen'
+    tickers = u'nilörngruppen'
 
     #arg = '12m'
     #arg = '1y'
