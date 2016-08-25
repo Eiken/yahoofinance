@@ -312,7 +312,7 @@ def runMe(tickers, arg=None):
                 percentage = 0.0
             
             out = formatName(name)
-            out += '({1}) quote is: {0} {2} '.format(latest, fticker, currency)
+            out += '({1}) quote is: {0:.2f} {2} '.format(latest, fticker, currency)
             out += formatPercentage(percentage)
         else:
             out = 'Found no ticker for ' + formatName(ticker) + 'at yahoo finance'
@@ -372,7 +372,8 @@ def test():
     #tickers = 'cur'
     #tickers = 'indu-c'
     #tickers = 'sas.st'
-    tickers = u'nilörngruppen'
+    tickers = 'fingerprint'
+    #tickers = u'nilörngruppen'
 
     #arg = '12m'
     #arg = '1y'
