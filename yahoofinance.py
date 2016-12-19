@@ -7,6 +7,7 @@ from datetime import datetime
 from datetime import timedelta
 import re
 import json
+import sys
 
 try:
     from sopel import module
@@ -24,11 +25,13 @@ def output(out):
     if botten is not None:
         botten.say(out)
     else:
-        print out
+        print(out)
 
 def getTicker(name, gimme=False):
-    if not type(name) is unicode:
-        name = name.decode('utf-8')
+    if int(sys.version[0]) == 2:
+        if not type(name) is unicode:
+            name = name.decode('utf-8')
+
     name = name.replace(u'ö', u'o')
     name = name.replace(u'ä', u'a')
     name = name.replace(u'å', u'a')
@@ -43,7 +46,12 @@ def getTicker(name, gimme=False):
         return None, None
 
     #html = response.content.lstrip("YAHOO.Finance.SymbolSuggest.ssCallback(").rstrip(")")
-    html = response.content.lstrip("YAHOO.util.ScriptNodeDataSource.callbacks(").rstrip(");")
+    html = response.content
+    if int(sys.version[0]) > 2:
+        html = html.decode('UTF-8')
+
+    html = html.lstrip("YAHOO.util.ScriptNodeDataSource.callbacks(")
+    html = html.rstrip(");")
     data = json.loads(html)
     result = data.get('ResultSet').get('Result')
     results = []
@@ -100,8 +108,10 @@ def getCurrentQuoteAlternative(ticker):
         'format': 'json',
         'view': 'detail',
     }
-
-    query = url + urllib.urlencode(q)
+    if int(sys.version[0]) == 2:
+        query = url + urllib.urlencode(q)
+    elif int(sys.version[0]) > 2:
+        query = url + urllib.parse.urlencode(q)
     headers = {
             "User-Agent": 
             "Mozilla/5.0 (Linux; Android 6.0; MotoE2(4G-LTE) Build/MPI24.65-39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.81 Mobile Safari/537.36"
@@ -112,7 +122,11 @@ def getCurrentQuoteAlternative(ticker):
         output("Failed to connect to yahoo")
         return None, None, None
 
-    dic = json.loads(result.content, strict=False)
+    html = result.content
+    if int(sys.version[0]) > 2:
+        html = html.decode('UTF-8')
+
+    dic = json.loads(html, strict=False)
     if dic is None:
         output("Failed to connect to yahoo")
         return None, None, None
@@ -372,8 +386,8 @@ def test():
     #tickers = 'cur'
     #tickers = 'indu-c'
     #tickers = 'sas.st'
-    tickers = 'fingerprint'
-    #tickers = u'nilörngruppen'
+    #tickers = 'fingerprint'
+    tickers = u'nilörngruppen'
 
     #arg = '12m'
     #arg = '1y'
