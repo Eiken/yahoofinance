@@ -173,8 +173,10 @@ def getCurrentQuote(ticker):
         output("Failed to connect to yahoo")
         return None, None, None
 
-        
-    dic = json.loads(result.content)
+    html = result.content
+    if int(sys.version[0]) > 2:
+        html = html.decode('UTF-8')    
+    dic = json.loads(html)
     if dic is None:
         output("Failed to connect to yahoo")
         return None, None, None
@@ -210,7 +212,10 @@ def getQuoteForRange(ticker, start, end):
         'diagnostics': 'true',
         'env': 'store://datatables.org/alltableswithkeys'
     }
-    query = url + urllib.urlencode(q)
+    if int(sys.version[0]) == 2:
+        query = url + urllib.urlencode(q)
+    elif int(sys.version[0]) > 2:
+        query = url + urllib.parse.urlencode(q)
     result = requests.get(query)
 
     try:
@@ -218,8 +223,10 @@ def getQuoteForRange(ticker, start, end):
     except requests.exceptions.RequestException as e:
         output("Failed to connect to yahoo")
         return None
-
-    dic = json.loads(result.content)
+    html = result.content
+    if int(sys.version[0]) > 2:
+        html = html.decode('UTF-8')  
+    dic = json.loads(html)
     if dic is None:
         output("Failed to connect to yahoo")
         return None, None, None
@@ -387,12 +394,12 @@ def test():
     #tickers = 'indu-c'
     #tickers = 'sas.st'
     #tickers = 'fingerprint'
-    tickers = u'nilörngruppen'
+    tickers = u'marketing group'
 
-    #arg = '12m'
+    arg = '1m'
     #arg = '1y'
     #arg = yt'15d'
-    arg = None
+    #arg = None
     #arg = '3d'
 
     runMe(tickers, arg)
