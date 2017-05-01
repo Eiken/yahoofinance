@@ -156,7 +156,7 @@ def getCurrentQuoteAlternative(ticker):
 
 def getCurrentQuote(ticker):
     #temp use this function
-    return  getCurrentQuoteAlternative(ticker)
+    #return  getCurrentQuoteAlternative(ticker)
     url = 'https://query.yahooapis.com/v1/public/yql?'
     q = {
         'q': 'select * from yahoo.finance.quotes where symbol in ("{0}")'.format(ticker),
@@ -165,7 +165,10 @@ def getCurrentQuote(ticker):
         'env': 'store://datatables.org/alltableswithkeys'
     }
 
-    query = url + urllib.urlencode(q)
+    if int(sys.version[0]) == 2:
+        query = url + urllib.urlencode(q)
+    elif int(sys.version[0]) > 2:
+        query = url + urllib.parse.urlencode(q)
     #print query
     try:
         result = requests.get(query)
@@ -389,17 +392,17 @@ def test():
     #tickers = 'G5EN.ST,PRIC-B.ST'
     #tickers = 'apple,pricer'
     #tickers = 'microsoft,fingerprint,pricer'
-    #tickers = 'pricer,interfox'
+    tickers = 'pricer,interfox'
     #tickers = 'cur'
     #tickers = 'indu-c'
     #tickers = 'sas.st'
     #tickers = 'fingerprint'
-    tickers = u'marketing group'
+    #tickers = u'marketing group'
 
-    arg = '1m'
+    #arg = '1m'
     #arg = '1y'
     #arg = yt'15d'
-    #arg = None
+    arg = None
     #arg = '3d'
 
     runMe(tickers, arg)
