@@ -1,3 +1,4 @@
 [submodule "get-yahoo-quotes-python"]
 	path = get-yahoo-quotes-python
 	url = https://github.com/Eiken/get-yahoo-quotes-python
+        ignore = dirty
