@@ -359,6 +359,15 @@ try:
         botten = bot
         runMe(tickers, arg)
 
+    @module.commands('yfind')
+    def yfind(bot, trigger):    
+        global botten
+        botten = bot
+        ticker = trigger.group(2)
+        findTickers(ticker)
+
+    # shortcuts
+
     @module.commands('aud')
     def audsek(bot, trigger):    
         tickers = 'audsek=x'
@@ -366,12 +375,12 @@ try:
         botten = bot
         runMe(tickers)
 
-    @module.commands('yfind')
-    def yfind(bot, trigger):    
+    @module.commands('bitte')
+    def bitte(bot, trigger):    
+        tickers = 'BTCUSD=X'
         global botten
         botten = bot
-        ticker = trigger.group(2)
-        findTickers(ticker)
+        runMe(tickers)
 
     @module.commands('curre', 'kurredutt')
     def curre(bot, trigger):    
@@ -391,7 +400,7 @@ def test():
     #tickers = 'G5EN.ST,PRIC-B.ST'
     #tickers = 'apple,pricer'
     #tickers = 'microsoft,fingerprint,pricer'
-    tickers = 'pricer,interfox'
+    tickers = 'pricer,BTCUSD=X'
     #tickers = 'cur'
     #tickers = 'indu-c'
     #tickers = 'sas.st'
