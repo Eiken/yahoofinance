@@ -12,7 +12,7 @@ import os
 import time
 import inspect
 
-yahoo_quotes = os.path.dirname(inspect.getfile(inspect.currentframe()))
+yahoo_quotes = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 yahoo_quotes = os.path.join(yahoo_quotes, 'get-yahoo-quotes-python')
 
 sys.path.append(yahoo_quotes)
