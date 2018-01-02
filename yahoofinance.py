@@ -103,15 +103,8 @@ def findTickers(ticker, maxresult=5):
         count += 1
 
 def getCurrentQuoteAlternative(ticker):
-    url = 'http://finance.yahoo.com/webservice/v1/symbols/{0}/quote?'.format(ticker)
-    q = {
-        'format': 'json',
-        'view': 'detail',
-    }
-    if int(sys.version[0]) == 2:
-        query = url + urllib.urlencode(q)
-    elif int(sys.version[0]) > 2:
-        query = url + urllib.parse.urlencode(q)
+    url = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols={0}&view=detail&format=json'.format(ticker)
+    query = url
     headers = {
             "User-Agent": 
             "Mozilla/5.0 (Linux; Android 6.0; MotoE2(4G-LTE) Build/MPI24.65-39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.81 Mobile Safari/537.36"
@@ -130,15 +123,14 @@ def getCurrentQuoteAlternative(ticker):
     if dic is None:
         output("Failed to connect to yahoo")
         return None, None, None
-    
-    resources = dic.get('list').get('resources')
+   
+    resources = dic.get('quoteResponse').get('result')
     resource = resources[0]
-    quote = resource.get('resource').get('fields')
 
-    latest = quote.get('price')
+    latest = resource.get('regularMarketPrice')
     if latest:
         latest = float(latest)
-        change = quote.get('change')
+        change = resource.get('regularMarketChange')
         if change:
             change = float(change)
         else:
@@ -155,8 +147,8 @@ def getCurrentQuoteAlternative(ticker):
     return latest, percentage, currency
 
 def getCurrentQuote(ticker):
-    #temp use this function
-    #return  getCurrentQuoteAlternative(ticker)
+    #use alternative until yql supports finance again
+    return  getCurrentQuoteAlternative(ticker)
     url = 'https://query.yahooapis.com/v1/public/yql?'
     q = {
         'q': 'select * from yahoo.finance.quotes where symbol in ("{0}")'.format(ticker),
@@ -178,13 +170,15 @@ def getCurrentQuote(ticker):
 
     html = result.content
     if int(sys.version[0]) > 2:
-        html = html.decode('UTF-8')    
+        html = html.decode('UTF-8')
     dic = json.loads(html)
     if dic is None:
         output("Failed to connect to yahoo")
         return None, None, None
 
-    quote = dic.get('query').get('results').get('quote')
+    query = dic.get('query')
+    results = query.get('results')
+    quote = results.get('quote')
     if type(quote)  == list:
         return None, None, None
 
