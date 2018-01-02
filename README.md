@@ -1,5 +1,5 @@
 # yahoofinance
-yahoofinance plugin for willie irc bot
+yahoofinance plugin for sopel irc bot
 
 Features:
 
