@@ -318,6 +318,11 @@ def runMe(tickers, arg=None):
         if fticker:
             latest, percentage, currency = getCurrentQuote(fticker)
 
+            if latest is None:
+                out = 'Found no data for ' + formatName(ticker) + 'at yahoo finance'
+                output(out)
+                return            
+            
             if arg is not None:
                 old = getQuoteForRange(fticker, startDateString, endDateString2)
 
