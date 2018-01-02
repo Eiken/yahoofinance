@@ -281,7 +281,7 @@ try:
         botten = bot
         runMe(tickers)
 
-    @module.commands('bitte')
+    @module.commands('bitte', 'btcusd', 'btc')
     def bitte(bot, trigger):    
         tickers = 'BTCUSD=X'
         global botten
@@ -307,7 +307,7 @@ def test():
     #tickers = 'apple,pricer'
     #tickers = 'microsoft,fingerprint,pricer'
     tickers = 'pricer,BTCUSD=X'
-    #tickers = 'cur'
+    tickers = 'cybaero'
     #tickers = 'indu-c'
     #tickers = 'sas.st'
     #tickers = 'fingerprint'
