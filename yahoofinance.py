@@ -8,6 +8,14 @@ from datetime import timedelta
 import re
 import json
 import sys
+import os
+import time
+
+yahoo_quotes = os.path.dirname(os.path.abspath(__file__))
+yahoo_quotes = os.path.join(yahoo_quotes, 'get-yahoo-quotes-python')
+
+sys.path.append(yahoo_quotes)
+import get_yahoo_quotes
 
 try:
     from sopel import module
@@ -78,8 +86,6 @@ def getTicker(name, gimme=False):
         return None, None
 
 
-
-
 def findTickers(ticker, maxresult=5):
     res = getTicker(ticker, gimme=True)
     if res[0] is None:
@@ -102,7 +108,7 @@ def findTickers(ticker, maxresult=5):
         output(out)
         count += 1
 
-def getCurrentQuoteAlternative(ticker):
+def getCurrentQuote(ticker):
     url = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols={0}&view=detail&format=json'.format(ticker)
     query = url
     headers = {
@@ -145,102 +151,6 @@ def getCurrentQuoteAlternative(ticker):
         currency = None
 
     return latest, percentage, currency
-
-def getCurrentQuote(ticker):
-    #use alternative until yql supports finance again
-    return  getCurrentQuoteAlternative(ticker)
-    url = 'https://query.yahooapis.com/v1/public/yql?'
-    q = {
-        'q': 'select * from yahoo.finance.quotes where symbol in ("{0}")'.format(ticker),
-        'format': 'json',
-        'diagnostics': 'true',
-        'env': 'store://datatables.org/alltableswithkeys'
-    }
-
-    if int(sys.version[0]) == 2:
-        query = url + urllib.urlencode(q)
-    elif int(sys.version[0]) > 2:
-        query = url + urllib.parse.urlencode(q)
-    #print query
-    try:
-        result = requests.get(query)
-    except requests.exceptions.RequestException as e:
-        output("Failed to connect to yahoo")
-        return None, None, None
-
-    html = result.content
-    if int(sys.version[0]) > 2:
-        html = html.decode('UTF-8')
-    dic = json.loads(html)
-    if dic is None:
-        output("Failed to connect to yahoo")
-        return None, None, None
-
-    query = dic.get('query')
-    results = query.get('results')
-    quote = results.get('quote')
-    if type(quote)  == list:
-        return None, None, None
-
-    latest = quote.get('LastTradePriceOnly')
-    if latest:
-        latest = float(latest)
-        change = quote.get('Change')
-        if change:
-            change = float(change)
-        else:
-            change = 0.0
-        o = latest - change
-        percentage = (latest / o) - 1.0
-        percentage *= 100.0
-        currency = quote.get('Currency')
-    else:
-        percentage = None
-        currency = None
-
-    return latest, percentage, currency
-
-
-def getQuoteForRange(ticker, start, end):
-    url = 'https://query.yahooapis.com/v1/public/yql?'
-    q = {
-        'q': 'select * from yahoo.finance.historicaldata where symbol = "{0}" and startDate = "{1}" and endDate = "{2}"'.format(ticker, start, end),
-        'format': 'json',
-        'diagnostics': 'true',
-        'env': 'store://datatables.org/alltableswithkeys'
-    }
-    if int(sys.version[0]) == 2:
-        query = url + urllib.urlencode(q)
-    elif int(sys.version[0]) > 2:
-        query = url + urllib.parse.urlencode(q)
-    result = requests.get(query)
-
-    try:
-        result = requests.get(query)
-    except requests.exceptions.RequestException as e:
-        output("Failed to connect to yahoo")
-        return None
-    html = result.content
-    if int(sys.version[0]) > 2:
-        html = html.decode('UTF-8')  
-    dic = json.loads(html)
-    if dic is None:
-        output("Failed to connect to yahoo")
-        return None, None, None
-
-    results = dic.get('query').get('results')
-
-    old = None
-
-    if results is not None:
-        quoteList = results.get('quote')
-
-        if not type(quoteList) is dict:
-            old = float(quoteList[-1].get('Close'))    
-        else:
-            old = float(quoteList.get('Close'))  
-            
-    return old
 
 
 def formatPercentage(percentage):
@@ -300,12 +210,8 @@ def runMe(tickers, arg=None):
 
         startDate = endDate - timeDelta
 
-        startDateString = startDate.strftime("%Y-%m-%d")
-        endDateString = endDate.strftime("%Y-%m-%d")
-
-        timeDelta2 = timedelta(days=30)
-        endDate2 = startDate + timeDelta2
-        endDateString2 = endDate2.strftime("%Y-%m-%d")
+        startDateUnix = int(time.mktime(startDate.timetuple()))
+        endDateUnix = int(time.mktime(endDate.timetuple()))
 
     for ticker in tickers:
         fticker, name = getTicker(ticker)
@@ -318,25 +224,25 @@ def runMe(tickers, arg=None):
                 return            
             
             if arg is not None:
-                old = getQuoteForRange(fticker, startDateString, endDateString2)
+                cookie, crumb = get_yahoo_quotes.get_cookie_crumb(fticker)
+                data_list = get_yahoo_quotes.get_data_list(fticker, startDateUnix, endDateUnix, cookie, crumb)
+                old = data_list[0]['Close']
+                startDate = data_list[0]['Date']
 
                 if old:
                     percentage = (latest - old) / old
                     percentage *= 100.0
 
                     out = formatName(name)
-                    out += "({4}) period quote: startdate: {0}; quote: {1}, enddate {2}; quote {3}. change: ".format(startDateString, old, endDateString, latest, fticker)
+                    out += "({4}) period quote: startdate: {0:%Y-%m-%d}; quote: {1}, enddate {2:%Y-%m-%d}; quote {3}. change: ".format(startDate, old, endDate, latest, fticker)
                     out += formatPercentage(percentage)
-                    output(out)         
-                    return
-
-               
-            if not percentage:
-                percentage = 0.0
-            
-            out = formatName(name)
-            out += '({1}) quote is: {0:.2f} {2} '.format(latest, fticker, currency)
-            out += formatPercentage(percentage)
+            else:                       
+                if not percentage:
+                    percentage = 0.0
+                
+                out = formatName(name)
+                out += '({1}) quote is: {0:.2f} {2} '.format(latest, fticker, currency)
+                out += formatPercentage(percentage)
         else:
             out = 'Found no ticker for ' + formatName(ticker) + 'at yahoo finance'
         
@@ -407,10 +313,10 @@ def test():
     #tickers = 'fingerprint'
     #tickers = u'marketing group'
 
-    #arg = '1m'
+    arg = '1m'
     #arg = '1y'
     #arg = yt'15d'
-    arg = None
+    #arg = None
     #arg = '3d'
 
     runMe(tickers, arg)
