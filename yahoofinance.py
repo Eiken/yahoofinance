@@ -293,7 +293,7 @@ try:
 
     @module.commands('bitte', 'btcusd', 'btc')
     def bitte(bot, trigger):    
-        tickers = 'BTCUSD=X'
+        tickers = 'BTC-USD'
         global botten
         botten = bot
         runMe(tickers)
