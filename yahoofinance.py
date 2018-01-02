@@ -111,16 +111,15 @@ def findTickers(ticker, maxresult=5):
 
 def getCurrentQuote(ticker):
     url = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols={0}&view=detail&format=json'.format(ticker)
-    query = url
     headers = {
             "User-Agent": 
             "Mozilla/5.0 (Linux; Android 6.0; MotoE2(4G-LTE) Build/MPI24.65-39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.81 Mobile Safari/537.36"
             }
     try:
-        result = requests.get(query, headers=headers)
+        result = requests.get(url, headers=headers)
     except requests.exceptions.RequestException as e:
         output("Failed to connect to yahoo")
-        return None, None, None
+        return None
 
     html = result.content
     if int(sys.version[0]) > 2:
@@ -129,9 +128,12 @@ def getCurrentQuote(ticker):
     dic = json.loads(html, strict=False)
     if dic is None:
         output("Failed to connect to yahoo")
-        return None, None, None
+        return None
    
     resources = dic.get('quoteResponse').get('result')
+    if not resources:
+        return None
+
     resource = resources[0]
 
     latest = resource.get('regularMarketPrice')
@@ -151,7 +153,9 @@ def getCurrentQuote(ticker):
         percentage = None
         currency = None
 
-    return latest, percentage, currency
+    name = resource.get('shortName')
+
+    return {"latest": latest, "percentage": percentage, "currency": currency, "name": name}
 
 
 def formatPercentage(percentage):
@@ -216,37 +220,42 @@ def runMe(tickers, arg=None):
 
     for ticker in tickers:
         fticker, name = getTicker(ticker)
-        if fticker:
-            latest, percentage, currency = getCurrentQuote(fticker)
-
-            if latest is None:
-                out = 'Found no data for ' + formatName(ticker) + 'at yahoo finance'
-                output(out)
-                return            
-            
-            if arg is not None:
-                cookie, crumb = get_yahoo_quotes.get_cookie_crumb(fticker)
-                data_list = get_yahoo_quotes.get_data_list(fticker, startDateUnix, endDateUnix, cookie, crumb)
-                old = data_list[0]['Close']
-                startDate = data_list[0]['Date']
-
-                if old:
-                    percentage = (latest - old) / old
-                    percentage *= 100.0
-
-                    out = formatName(name)
-                    out += "({4}) period quote: startdate: {0:%Y-%m-%d}; quote: {1}, enddate {2:%Y-%m-%d}; quote {3}. change: ".format(startDate, old, endDate, latest, fticker)
-                    out += formatPercentage(percentage)
-            else:                       
-                if not percentage:
-                    percentage = 0.0
-                
-                out = formatName(name)
-                out += '({1}) quote is: {0:.2f} {2} '.format(latest, fticker, currency)
-                out += formatPercentage(percentage)
-        else:
-            out = 'Found no ticker for ' + formatName(ticker) + 'at yahoo finance'
+        if not fticker:
+            fticker = ticker
         
+        res = getCurrentQuote(fticker)
+
+        if res is None:
+            out = 'Found no data for ' + formatName(ticker) + 'at yahoo finance'
+            output(out)
+            return
+
+        latest = res.get('latest')
+        percentage = res.get('percentage')
+        currency = res.get('currency')     
+        name = res.get('name')
+        
+        if arg is not None:
+            cookie, crumb = get_yahoo_quotes.get_cookie_crumb(fticker)
+            data_list = get_yahoo_quotes.get_data_list(fticker, startDateUnix, endDateUnix, cookie, crumb)
+            old = data_list[0]['Close']
+            startDate = data_list[0]['Date']
+
+            if old:
+                percentage = (latest - old) / old
+                percentage *= 100.0
+
+                out = formatName(name)
+                out += "({4}) period quote: startdate: {0:%Y-%m-%d}; quote: {1}, enddate {2:%Y-%m-%d}; quote {3}. change: ".format(startDate, old, endDate, latest, fticker)
+                out += formatPercentage(percentage)
+        else:                       
+            if not percentage:
+                percentage = 0.0
+            
+            out = formatName(name)
+            out += '({1}) quote is: {0:.2f} {2} '.format(latest, fticker, currency)
+            out += formatPercentage(percentage)
+           
         output(out)
 
 try:
@@ -307,17 +316,17 @@ def test():
     #tickers = 'G5EN.ST,PRIC-B.ST'
     #tickers = 'apple,pricer'
     #tickers = 'microsoft,fingerprint,pricer'
-    tickers = 'pricer,BTCUSD=X'
-    tickers = 'cybaero'
+    #tickers = 'pricer,BTCUSD=X'
+    tickers = 'DOGE-USD'
     #tickers = 'indu-c'
     #tickers = 'sas.st'
     #tickers = 'fingerprint'
     #tickers = u'marketing group'
 
-    arg = '1m'
+    #arg = '1m'
     #arg = '1y'
     #arg = yt'15d'
-    #arg = None
+    arg = None
     #arg = '3d'
 
     runMe(tickers, arg)
