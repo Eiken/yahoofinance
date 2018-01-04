@@ -210,7 +210,7 @@ def runMe(tickers, arg=None):
         res = getCurrentQuote(fticker)
 
         if res is None:
-            out = 'Found no data for ' + formatName(ticker) + 'at yahoo finance'
+            out = 'Found no data for ' + formatBold(ticker) + 'at yahoo finance'
             output(out)
             return
 
@@ -219,11 +219,11 @@ def runMe(tickers, arg=None):
         if arg is not None:
             cookie, crumb = get_yahoo_quotes.get_cookie_crumb(fticker)
             data_list = get_yahoo_quotes.get_data_list(fticker, startDateUnix, endDateUnix, cookie, crumb)
-            old = data_list[0]['Close']
-            startDate = data_list[0]['Date']
-
-            if old:
-                percentage = (latest - old) / old
+            
+            if data_list:
+                old = data_list[0]['Close']
+                startDate = data_list[0]['Date']
+                percentage = (res.get('regularMarketPrice') - old) / old
                 percentage *= 100.0
 
                 res['startdate'] = startDate
@@ -232,6 +232,8 @@ def runMe(tickers, arg=None):
 
                 out = base_out_period
                 out += formatPercentage(percentage)
+            else:
+                out = 'Found no historical data for ' + formatBold(ticker) + 'at yahoo finance'
         else:
             out = base_out
             out += formatPercentage(percentage)
@@ -329,8 +331,8 @@ def test():
     #arg = '1m'
     #arg = '1y'
     #arg = yt'15d'
-    arg = None
-    #arg = '3d'
+    #arg = None
+    arg = '3d'
 
     runMe(tickers, arg)
 
