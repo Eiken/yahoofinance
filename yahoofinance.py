@@ -135,27 +135,7 @@ def getCurrentQuote(ticker):
         return None
 
     resource = resources[0]
-
-    latest = resource.get('regularMarketPrice')
-    if latest:
-        latest = float(latest)
-        change = resource.get('regularMarketChange')
-        if change:
-            change = float(change)
-        else:
-            change = 0.0
-        o = latest - change
-        percentage = (latest / o) - 1.0
-        percentage *= 100.0
-        #currency = quote.get('Currency')
-        currency = ''
-    else:
-        percentage = None
-        currency = None
-
-    name = resource.get('shortName')
-
-    return {"latest": latest, "percentage": percentage, "currency": currency, "name": name}
+    return resource
 
 
 def formatPercentage(percentage):
@@ -218,6 +198,10 @@ def runMe(tickers, arg=None):
         startDateUnix = int(time.mktime(startDate.timetuple()))
         endDateUnix = int(time.mktime(endDate.timetuple()))
 
+    base_out_period = r"\x02{shortName}\x02 ({symbol}): {startdate:%Y-%m-%d} - {enddate:%Y-%m-%d}: {old_quote} - {regularMarketPrice} {currency} "
+    base_out = r'\x02{shortName}\x02 ({symbol}): {regularMarketPrice} {currency} '
+    extra_out = r'. \x02Day range\x02: {regularMarketDayLow}-{regularMarketDayHigh}. \x02Day volume\x02: {regularMarketVolume}. \x02Net worth\x02: {marketCap:.2f} M{currency}. \x02Trailing P/E\x02: {trailingPE:.2f}.'
+
     for ticker in tickers:
         fticker, name = getTicker(ticker)
         if not fticker:
@@ -230,11 +214,8 @@ def runMe(tickers, arg=None):
             output(out)
             return
 
-        latest = res.get('latest')
-        percentage = res.get('percentage')
-        currency = res.get('currency')     
-        name = res.get('name')
-        
+        percentage = res.get('regularMarketChangePercent')
+       
         if arg is not None:
             cookie, crumb = get_yahoo_quotes.get_cookie_crumb(fticker)
             data_list = get_yahoo_quotes.get_data_list(fticker, startDateUnix, endDateUnix, cookie, crumb)
@@ -245,16 +226,18 @@ def runMe(tickers, arg=None):
                 percentage = (latest - old) / old
                 percentage *= 100.0
 
-                out = formatName(name)
-                out += "({4}) period quote: startdate: {0:%Y-%m-%d}; quote: {1}, enddate {2:%Y-%m-%d}; quote {3}. change: ".format(startDate, old, endDate, latest, fticker)
+                res['startdate'] = startDate
+                res['enddate'] = endDate
+                res['old_quote'] = old
+
+                out = base_out_period.format(**res)
                 out += formatPercentage(percentage)
-        else:                       
-            if not percentage:
-                percentage = 0.0
-            
-            out = formatName(name)
-            out += '({1}) quote is: {0} {2} '.format(latest, fticker, currency)
+        else:
+            res['marketCap'] = res['marketCap'] / 1000000.0
+            out = base_out
             out += formatPercentage(percentage)
+            out += extra_out
+            out = out.format(**res)
            
         output(out)
 
@@ -298,6 +281,13 @@ try:
         botten = bot
         runMe(tickers)
 
+    @module.commands('crypto')
+    def crypto(bot, trigger):    
+        tickers = 'BTC-USD,ETH-USD,XRP-USD'
+        global botten
+        botten = bot
+        runMe(tickers)
+
     @module.commands('curre', 'kurredutt')
     def curre(bot, trigger):    
         global botten
@@ -317,9 +307,9 @@ def test():
     #tickers = 'apple,pricer'
     #tickers = 'microsoft,fingerprint,pricer'
     #tickers = 'pricer,BTCUSD=X'
-    tickers = 'DOGE-USD'
+    #tickers = 'DOGE-USD'
     #tickers = 'indu-c'
-    #tickers = 'sas.st'
+    tickers = 'pricer'
     #tickers = 'fingerprint'
     #tickers = u'marketing group'
 
