@@ -14,8 +14,8 @@ import inspect
 
 yahoo_quotes = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 yahoo_quotes = os.path.join(yahoo_quotes, 'get-yahoo-quotes-python')
-
-sys.path.append(yahoo_quotes)
+if os.path.isdir(yahoo_quotes):
+    sys.path.append(yahoo_quotes)
 import get_yahoo_quotes
 
 try:
@@ -154,7 +154,7 @@ def formatPercentage(percentage):
 
     return pf
 
-def formatName(name):
+def formatBold(name):
     out = u'{0} '.format(name).replace('\n', '')
     if formatting:
         out = formatting.bold(out)
@@ -198,9 +198,9 @@ def runMe(tickers, arg=None):
         startDateUnix = int(time.mktime(startDate.timetuple()))
         endDateUnix = int(time.mktime(endDate.timetuple()))
 
-    base_out_period = r"\x02{shortName}\x02 ({symbol}): {startdate:%Y-%m-%d} - {enddate:%Y-%m-%d}: {old_quote} - {regularMarketPrice} {currency} "
-    base_out = r'\x02{shortName}\x02 ({symbol}): {regularMarketPrice} {currency} '
-    extra_out = r'. \x02Day range\x02: {regularMarketDayLow}-{regularMarketDayHigh}. \x02Day volume\x02: {regularMarketVolume}. \x02Net worth\x02: {marketCap:.2f} M{currency}. \x02Trailing P/E\x02: {trailingPE:.2f}.'
+    base_out_period = "{shortName} ({symbol}): {startdate:%Y-%m-%d} - {enddate:%Y-%m-%d}: {old_quote} - {regularMarketPrice} {currency} "
+    base_out = '{shortName} ({symbol}): {regularMarketPrice} {currency} '
+    extra_out = '{dayRange}{dayVolume}{netWorth}{pe}'
 
     for ticker in tickers:
         fticker, name = getTicker(ticker)
@@ -230,15 +230,28 @@ def runMe(tickers, arg=None):
                 res['enddate'] = endDate
                 res['old_quote'] = old
 
-                out = base_out_period.format(**res)
+                out = base_out_period
                 out += formatPercentage(percentage)
         else:
-            res['marketCap'] = res['marketCap'] / 1000000.0
             out = base_out
             out += formatPercentage(percentage)
             out += extra_out
-            out = out.format(**res)
-           
+
+        res['shortName'] = formatBold(res['shortName'])
+        res['dayRange'] = '. ' + formatBold('Day range') + ': {regularMarketDayLow}-{regularMarketDayHigh}'.format(**res)
+        res['dayVolume'] = '. ' + formatBold('Day volume') + ': {regularMarketVolume}'.format(**res)
+        if 'marketCap' in res:
+            res['marketCap'] = res['marketCap'] / 1000000.0
+            res['netWorth'] = '. ' + formatBold('Net worth') + ': {marketCap:.2f} M{currency}'.format(**res)
+        else:
+            res['netWorth'] = ''
+
+        if 'trailingPE' in res:
+            res['pe'] = '. ' + formatBold('Trailing P/E') + ': {trailingPE:.2f}'.format(**res)
+        else:
+            res['pe'] = ''
+
+        out = out.format(**res)          
         output(out)
 
 try:
@@ -309,7 +322,7 @@ def test():
     #tickers = 'pricer,BTCUSD=X'
     #tickers = 'DOGE-USD'
     #tickers = 'indu-c'
-    tickers = 'pricer'
+    tickers = 'pricer,netflix,doge-usd,cure'
     #tickers = 'fingerprint'
     #tickers = u'marketing group'
 
