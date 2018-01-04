@@ -215,6 +215,9 @@ def runMe(tickers, arg=None):
             return
 
         percentage = res.get('regularMarketChangePercent')
+
+        if 'shortName' not in res:
+            res['shortName'] = res['longName']
        
         if arg is not None:
             cookie, crumb = get_yahoo_quotes.get_cookie_crumb(fticker)
@@ -324,7 +327,7 @@ def test():
     #tickers = 'pricer,BTCUSD=X'
     #tickers = 'DOGE-USD'
     #tickers = 'indu-c'
-    tickers = 'pricer,netflix,doge-usd,cure'
+    tickers = 'pricer,netflix,doge-usd,cure,aurora'
     #tickers = 'fingerprint'
     #tickers = u'marketing group'
 
