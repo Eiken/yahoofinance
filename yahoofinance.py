@@ -209,7 +209,7 @@ def runMe(tickers, arg=None):
         
         res = getCurrentQuote(fticker)
 
-        if res is None:
+        if res is None or 'regularMarketChangePercent' not in res:
             out = 'Found no data for ' + formatBold(ticker) + 'at yahoo finance'
             output(out)
             return
@@ -327,15 +327,15 @@ def test():
     #tickers = 'pricer,BTCUSD=X'
     #tickers = 'DOGE-USD'
     #tickers = 'indu-c'
-    tickers = 'pricer,netflix,doge-usd,cure,aurora'
+    tickers = 'harvest one cannabis'
     #tickers = 'fingerprint'
     #tickers = u'marketing group'
 
     #arg = '1m'
     #arg = '1y'
     #arg = yt'15d'
-    #arg = None
-    arg = '3d'
+    arg = None
+    #arg = '3d'
 
     runMe(tickers, arg)
 
