@@ -11,6 +11,7 @@ import sys
 import os
 import time
 import inspect
+from pprint import pprint
 
 yahoo_quotes = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 yahoo_quotes = os.path.join(yahoo_quotes, 'get-yahoo-quotes-python')
@@ -216,8 +217,10 @@ def runMe(tickers, arg=None):
 
         percentage = res.get('regularMarketChangePercent')
 
-        if 'shortName' not in res:
+        if 'shortName' not in res and 'longName' in res:
             res['shortName'] = res['longName']
+        elif 'shortName' not in res:
+            res['shortName'] = res['symbol']
        
         if arg is not None:
             cookie, crumb = get_yahoo_quotes.get_cookie_crumb(fticker)
@@ -327,7 +330,7 @@ def test():
     #tickers = 'pricer,BTCUSD=X'
     #tickers = 'DOGE-USD'
     #tickers = 'indu-c'
-    tickers = 'harvest one cannabis'
+    tickers = 'kkd'
     #tickers = 'fingerprint'
     #tickers = u'marketing group'
 
