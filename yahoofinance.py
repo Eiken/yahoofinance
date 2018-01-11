@@ -303,7 +303,7 @@ try:
         runMe(tickers)
 
     @module.commands('doge')
-    def bitte(bot, trigger):
+    def doggi(bot, trigger):
         tickers = 'DOGE-USD'
         global botten
         botten = bot
