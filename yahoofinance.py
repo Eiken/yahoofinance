@@ -308,9 +308,16 @@ try:
         botten = bot
         runMe(tickers)
 
+    @module.commands('doge')
+    def doggi(bot, trigger):
+        tickers = 'DOGE-USD'
+        global botten
+        botten = bot
+        runMe(tickers)
+
     @module.commands('crypto')
     def crypto(bot, trigger):    
-        tickers = 'BTC-USD,ETH-USD,XRP-USD'
+        tickers = 'BTC-USD,ETH-USD,XRP-USD,DOGE-USD'
         global botten
         botten = bot
         runMe(tickers)
