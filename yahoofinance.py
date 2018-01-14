@@ -13,10 +13,16 @@ import time
 import inspect
 from pprint import pprint
 
-yahoo_quotes = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-yahoo_quotes = os.path.join(yahoo_quotes, 'get-yahoo-quotes-python')
-if os.path.isdir(yahoo_quotes):
-    sys.path.append(yahoo_quotes)
+current_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+submodule_folder = os.path.join(current_folder, 'get-yahoo-quotes-python')
+
+# find location of get_yahoo_quotes and add to path so we can import
+for f in [current_folder, submodule_folder]:
+    get_yahoo_quotes_path = os.path.join(f, 'get_yahoo_quotes.py')
+    if os.path.isfile(get_yahoo_quotes_path):
+        sys.path.append(f)
+        break
+
 import get_yahoo_quotes
 
 try:
