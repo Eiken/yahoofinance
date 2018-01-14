@@ -13,10 +13,13 @@ import time
 import inspect
 from pprint import pprint
 
+
+
 yahoo_quotes = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-yahoo_quotes = os.path.join(yahoo_quotes, 'get-yahoo-quotes-python')
-if os.path.isdir(yahoo_quotes):
-    sys.path.append(yahoo_quotes)
+yahoo_quotes = os.path.join(yahoo_quotes, 'get_yahoo_quotes.py')
+
+sys.path.append(yahoo_quotes)
+
 import get_yahoo_quotes
 
 try:
