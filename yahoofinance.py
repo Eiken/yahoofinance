@@ -251,6 +251,7 @@ def runMe(tickers, arg=None):
             out += formatPercentage(percentage)
             out += extra_out
 
+
         res['shortName'] = formatBold(res['shortName'])
         res['dayRange'] = '. ' + formatBold('Day range') + ': {regularMarketDayLow}-{regularMarketDayHigh}'.format(**res)
         res['dayVolume'] = '. ' + formatBold('Day volume') + ': {regularMarketVolume}'.format(**res)
@@ -264,7 +265,9 @@ def runMe(tickers, arg=None):
             res['pe'] = '. ' + formatBold('Trailing P/E') + ': {trailingPE:.2f}'.format(**res)
         else:
             res['pe'] = ''
-
+        
+        if 'currency' not in res:
+            res['currency'] = ''
         out = out.format(**res)          
         output(out)
 
