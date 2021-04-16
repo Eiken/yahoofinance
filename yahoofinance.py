@@ -12,18 +12,10 @@ import os
 import time
 import inspect
 from pprint import pprint
+import importlib.machinery
 
 current_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-submodule_folder = os.path.join(current_folder, 'get-yahoo-quotes-python')
-
-# find location of get_yahoo_quotes and add to path so we can import
-for f in [current_folder, submodule_folder]:
-    get_yahoo_quotes_path = os.path.join(f, 'get_yahoo_quotes.py')
-    if os.path.isfile(get_yahoo_quotes_path):
-        sys.path.append(f)
-        break
-
-import get_yahoo_quotes
+get_yahoo_quotes = importlib.machinery.SourceFileLoader('get_yahoo_quotes',os.path.join(current_folder, "get_yahoo_quotes.py")).load_module()
 
 try:
     from sopel import module
@@ -338,7 +330,7 @@ except:
     pass
 
 def test():
-    #tickers = 'PRIC-B.ST'
+    tickers = 'PRIC-B.ST'
     #tickers = 'G5EN.ST'
     #tickers = 'G5EN.ST,PRIC-B.ST'
     #tickers = 'apple,pricer'
@@ -346,7 +338,7 @@ def test():
     #tickers = 'pricer,BTCUSD=X'
     #tickers = 'DOGE-USD'
     #tickers = 'indu-c'
-    tickers = 'kkd'
+    #tickers = 'kkd'
     #tickers = 'fingerprint'
     #tickers = u'marketing group'
 
