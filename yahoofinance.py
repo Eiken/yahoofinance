@@ -14,7 +14,9 @@ import inspect
 from pprint import pprint
 import importlib.machinery
 
-current_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+current_folder = os.path.dirname(
+    os.path.abspath(inspect.getfile(inspect.currentframe()))
+)
 get_yahoo_quotes = importlib.machinery.SourceFileLoader(
     "get_yahoo_quotes", os.path.join(current_folder, "get_yahoo_quotes.py")
 ).load_module()
@@ -77,13 +79,17 @@ def getTicker(name, gimme=False):
 
     if result:
         if gimme is True:
-            for r in sorted(result, key=lambda x: sortOrder.get(x.get("typeDisp"), 999)):
+            for r in sorted(
+                result, key=lambda x: sortOrder.get(x.get("typeDisp"), 999)
+            ):
                 results.append([r.get("symbol"), r.get("name"), r.get("typeDisp")])
 
             return results
         else:
             # try to find swedish stocks first
-            for r in sorted(result, key=lambda x: sortOrder.get(x.get("typeDisp"), 999)):
+            for r in sorted(
+                result, key=lambda x: sortOrder.get(x.get("typeDisp"), 999)
+            ):
                 if r.get("exch") == "STO":
                     return r.get("symbol"), r.get("name")
 
@@ -331,9 +337,30 @@ try:
         botten = bot
         runMe(tickers)
 
+    @module.commands("ada", "cardano")
+    def adan(bot, trigger):
+        tickers = "BTC-USD"
+        global botten
+        botten = bot
+        runMe(tickers)
+
+    @module.commands("eth", "ether")
+    def eth(bot, trigger):
+        tickers = "ETH-USD"
+        global botten
+        botten = bot
+        runMe(tickers)
+
     @module.commands("doge")
     def doggi(bot, trigger):
         tickers = "DOGE-USD"
+        global botten
+        botten = bot
+        runMe(tickers)
+
+    @module.commands("wsb", "wallstreetbets", "yesorno")
+    def wsb(bot, trigger):
+        tickers = "GME,AMC,TSLA,NOK,RKT,PLTR,NIO"
         global botten
         botten = bot
         runMe(tickers)
@@ -345,12 +372,40 @@ try:
         botten = bot
         runMe(tickers)
 
-    @module.commands("curre", "kurredutt")
-    def curre(bot, trigger):
+    @module.commands("metal")
+    def metal(bot, trigger):
+        tickers = "GC=F,SI=F,HG=F"
         global botten
         botten = bot
-        ticker = "CUR"
-        runMe(ticker)
+        runMe(tickers)
+
+    @module.commands("oil")
+    def olja(bot, trigger):
+        tickers = "CL=F,BZ=F,HO=F"
+        global botten
+        botten = bot
+        runMe(tickers)
+
+    @module.commands("asien")
+    def asia(bot, trigger):
+        tickers = "399001.SZ,^HSI,^N225"
+        global botten
+        botten = bot
+        runMe(tickers)
+
+    @module.commands("börsen")
+    def borsen(bot, trigger):
+        tickers = "^OMX,^GDAXI,^GSPC,BTC-USD"
+        global botten
+        botten = bot
+        runMe(tickers)
+
+    @module.commands("omx")
+    def omxen(bot, trigger):
+        tickers = "^OMX"
+        global botten
+        botten = bot
+        runMe(tickers)
 
 
 except:
