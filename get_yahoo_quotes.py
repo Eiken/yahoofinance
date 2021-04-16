@@ -28,20 +28,20 @@ import requests
 
 
 def split_crumb_store(v):
-    return v.split(':')[2].strip('"')
+    return v.split(":")[2].strip('"')
 
 
 def find_crumb_store(lines):
     # Looking for
     # ,"CrumbStore":{"crumb":"9q.A4D1c.b9
     for l in lines:
-        if re.findall(r'CrumbStore', l):
+        if re.findall(r"CrumbStore", l):
             return l
     print("Did not find CrumbStore")
 
 
 def get_cookie_value(r):
-    return {'B': r.cookies['B']}
+    return {"B": r.cookies["B"]}
 
 
 def get_page_data(symbol):
@@ -52,8 +52,8 @@ def get_page_data(symbol):
     # Code to replace possible \u002F value
     # ,"CrumbStore":{"crumb":"FWP\u002F5EFll3U"
     # FWP\u002F5EFll3U
-    lines = r.content.decode('unicode-escape').strip(). replace('}', '\n')
-    return cookie, lines.split('\n')
+    lines = r.content.decode("unicode-escape").strip().replace("}", "\n")
+    return cookie, lines.split("\n")
 
 
 def get_cookie_crumb(symbol):
@@ -63,24 +63,28 @@ def get_cookie_crumb(symbol):
 
 
 def get_data_list(symbol, start_date, end_date, cookie, crumb):
-    url = "https://query1.finance.yahoo.com/v7/finance/download/{symbol}?period1={start_date}&period2={end_date}&interval=1d&events=history&crumb={crumb}".format(symbol=symbol, start_date=start_date, end_date=end_date, crumb=crumb)
+    url = "https://query1.finance.yahoo.com/v7/finance/download/{symbol}?period1={start_date}&period2={end_date}&interval=1d&events=history&crumb={crumb}".format(
+        symbol=symbol, start_date=start_date, end_date=end_date, crumb=crumb
+    )
     try:
         response = requests.get(url, cookies=cookie)
     except requests.exceptions.RequestException as e:
         return {}
 
-    lines = response.content.split('\n')
-    headers = lines[0].split(',')
+    lines = response.content
+    lines = str(lines)
+    lines = lines.split(r"\n")
+    headers = lines[0].split(",")
     data_list = []
     for l in lines[1:]:
         l = l.strip("'")
         null_found = False
         if not l:
             continue
-        vals = l.split(',')
+        vals = l.split(",")
 
         for v in vals:
-            if v == 'null':
+            if v == "null":
                 null_found = True
 
         if null_found is True:
@@ -88,13 +92,13 @@ def get_data_list(symbol, start_date, end_date, cookie, crumb):
 
         data = {}
         # ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
-        data['Date'] = datetime.datetime.strptime(vals[0], '%Y-%m-%d')
-        data['Open'] = float(vals[1])
-        data['High'] = float(vals[2])
-        data['Low'] = float(vals[3])
-        data['Close'] = float(vals[4])
-        data['Adj Close'] = float(vals[5])
-        data['Volume'] = int(vals[6])
+        data["Date"] = datetime.datetime.strptime(vals[0], "%Y-%m-%d")
+        data["Open"] = float(vals[1])
+        data["High"] = float(vals[2])
+        data["Low"] = float(vals[3])
+        data["Close"] = float(vals[4])
+        data["Adj Close"] = float(vals[5])
+        data["Volume"] = int(vals[6])
 
         data_list.append(data)
 
@@ -102,10 +106,13 @@ def get_data_list(symbol, start_date, end_date, cookie, crumb):
 
 
 def get_data(symbol, start_date, end_date, cookie, crumb):
-    filename = '%s.csv' % (symbol)
-    url = "https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%s&period2=%s&interval=1d&events=history&crumb=%s" % (symbol, start_date, end_date, crumb)
+    filename = "%s.csv" % (symbol)
+    url = (
+        "https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%s&period2=%s&interval=1d&events=history&crumb=%s"
+        % (symbol, start_date, end_date, crumb)
+    )
     response = requests.get(url, cookies=cookie)
-    with open (filename, 'wb') as handle:
+    with open(filename, "wb") as handle:
         for block in response.iter_content(1024):
             handle.write(block)
 
@@ -143,5 +150,6 @@ def main():
             list_quotes(symbol)
             print("--------------------------------------------------")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
