@@ -8,3 +8,9 @@ Features:
 *Historical quote over period specified in y,m,d
 
 *Search tickers by name
+
+
+# pip dependencies
+
+yahooquery
+sopel

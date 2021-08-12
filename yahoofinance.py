@@ -1,34 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import re
+import time
+import json
 import requests
-import urllib
 import sys
+import inspect
 from datetime import datetime
 from datetime import timedelta
-import re
-import json
-import sys
-import os
-import time
-import inspect
 from pprint import pprint
-import importlib.machinery
 
-current_folder = os.path.dirname(
-    os.path.abspath(inspect.getfile(inspect.currentframe()))
-)
-get_yahoo_quotes = importlib.machinery.SourceFileLoader(
-    "get_yahoo_quotes", os.path.join(current_folder, "get_yahoo_quotes.py")
-).load_module()
+import yahooquery
 
-try:
-    from sopel import module
-    from sopel import formatting
-except:
-    module = None
-    formatting = None
-    # import traceback
-    # traceback.print_exc(file=sys.stdout)
+from sopel import module
+from sopel import formatting
 
 botten = None
 
@@ -38,117 +23,44 @@ def output(out):
     if botten is not None:
         botten.say(out)
     else:
+        # Debug print for development outside of sopel
+        print(repr(out))
         print(out)
 
 
-def getTicker(name, gimme=False):
-    if int(sys.version[0]) == 2:
-        if not type(name) is unicode:
-            name = name.decode("utf-8")
+def getTicker(name):
+    """
+    Get symbol ticker from arbitrary name. Return first search result
+    """
+    search_result = yahooquery.search(name)
 
-    name = name.replace(u"ö", u"o")
-    name = name.replace(u"ä", u"a")
-    name = name.replace(u"å", u"a")
+    quotes = search_result.get("quotes")
 
-    # url = u"http://d.yimg.com/autoc.finance.yahoo.com/autoc?query={0}&callback=YAHOO.Finance.SymbolSuggest.ssCallback".format(name)
-    url = u"https://s.yimg.com/aq/autoc?query={0}&region=CA&lang=en-CA&callback=YAHOO.util.ScriptNodeDataSource.callbacks".format(
-        name
-    )
-
-    try:
-        response = requests.get(url)
-    except requests.exceptions.RequestException as e:
-        output("Failed to connect to yahoo")
+    if not quotes:
         return None, None
 
-    # html = response.content.lstrip("YAHOO.Finance.SymbolSuggest.ssCallback(").rstrip(")")
-    html = response.content
-    if int(sys.version[0]) > 2:
-        html = html.decode("UTF-8")
+    first_quote = quotes[0]
 
-    html = html.lstrip("YAHOO.util.ScriptNodeDataSource.callbacks(")
-    html = html.rstrip(");")
-    data = json.loads(html)
-    result = data.get("ResultSet").get("Result")
-    results = []
-    sortOrder = {}
-    sortOrder["Index"] = 0
-    sortOrder["Equity"] = 1
-    sortOrder["Futures"] = 2
-    sortOrder["ETF"] = 3
-
-    if result:
-        if gimme is True:
-            for r in sorted(
-                result, key=lambda x: sortOrder.get(x.get("typeDisp"), 999)
-            ):
-                results.append([r.get("symbol"), r.get("name"), r.get("typeDisp")])
-
-            return results
-        else:
-            # try to find swedish stocks first
-            for r in sorted(
-                result, key=lambda x: sortOrder.get(x.get("typeDisp"), 999)
-            ):
-                if r.get("exch") == "STO":
-                    return r.get("symbol"), r.get("name")
-
-            return result[0].get("symbol"), result[0].get("name")
-    else:
-        return None, None
+    return first_quote.get("symbol"), first_quote.get("longname")
 
 
 def findTickers(ticker, maxresult=5):
-    res = getTicker(ticker, gimme=True)
-    if res[0] is None:
+    search_result = yahooquery.search(ticker)
+    quotes = search_result.get("quotes")
+    if not quotes:
         out = "Found no tickers"
         output(out)
         return
-    out = "Found {0} tickers. Max result is {1}.".format(len(res), maxresult)
-    output(out)
-    count = 0
-    for r in res:
-        if count == maxresult:
-            break
-        out = r[1]
-        if formatting:
-            out = formatting.bold(out)
 
-        out += " ({0})".format(r[0])
-        out += " of type {0}".format(r[2])
+    out = "Found {0} tickers. Max result is {1}.".format(len(quotes), maxresult)
+    output(out)
+    for r in quotes[:maxresult]:
+        out = formatting.bold(r.get("symbol"))
+
+        out += " ({0})".format(r.get("longname"))
+        out += " of type {0}".format(r.get("typeDisp"))
 
         output(out)
-        count += 1
-
-
-def getCurrentQuote(ticker):
-    url = "https://query1.finance.yahoo.com/v7/finance/quote?symbols={0}&view=detail&format=json".format(
-        ticker
-    )
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; MotoE2(4G-LTE) Build/MPI24.65-39) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.81 Mobile Safari/537.36"
-    }
-    try:
-        result = requests.get(url, headers=headers)
-    except requests.exceptions.RequestException as e:
-        output("Failed to connect to yahoo")
-        return None
-
-    html = result.content
-    if int(sys.version[0]) > 2:
-        html = html.decode("UTF-8")
-
-    dic = json.loads(html, strict=False)
-    if dic is None:
-        output("Failed to connect to yahoo")
-        return None
-
-    resources = dic.get("quoteResponse").get("result")
-    if not resources:
-        return None
-
-    resource = resources[0]
-    return resource
 
 
 def formatPercentage(percentage):
@@ -168,13 +80,6 @@ def formatPercentage(percentage):
     return pf
 
 
-def formatBold(name):
-    out = u"{0} ".format(name).replace("\n", "")
-    if formatting:
-        out = formatting.bold(out)
-    return out
-
-
 def runMe(tickers, arg=None):
     if not tickers:
         output("No arguments passed")
@@ -183,115 +88,47 @@ def runMe(tickers, arg=None):
     tickers = tickers.split(",")
     totalPercentage = []
 
-    if arg is not None:
-        days = re.findall("(\d+)(d)", arg)
-        months = re.findall("(\d+)(m)", arg)
-        years = re.findall("(\d+)(y)", arg)
-
-        endDate = datetime.now()
-
-        if years:
-            years = int(years[0][0])
-        else:
-            years = 0
-
-        if months:
-            months = int(months[0][0])
-        else:
-            months = 0
-
-        if days:
-            days = int(days[0][0])
-        else:
-            days = 0
-
-        timeDelta = timedelta(days=days + months * 30 + years * 365)
-
-        startDate = endDate - timeDelta
-
-        startDateUnix = int(time.mktime(startDate.timetuple()))
-        endDateUnix = int(time.mktime(endDate.timetuple()))
-
     base_out_period = "{shortName} ({symbol}): {startdate:%Y-%m-%d} - {enddate:%Y-%m-%d}: {old_quote} - {regularMarketPrice} {currency} "
     base_out = "{shortName} ({symbol}): {regularMarketPrice} {currency} "
-    extra_out = "{dayRange}{dayVolume}{netWorth}{pe}"
 
     for ticker in tickers:
+        res = {}
         fticker, name = getTicker(ticker)
         if not fticker:
             fticker = ticker
 
-        res = getCurrentQuote(fticker)
+        t = yahooquery.Ticker(fticker)
 
-        if res is None or "regularMarketChangePercent" not in res:
-            out = "Found no data for " + formatBold(ticker) + "at yahoo finance"
-            output(out)
-            return
+        res.update(t.summary_detail)
 
-        percentage = res.get("regularMarketChangePercent")
+        price_info = t.price
+        res.update(price_info.get(fticker))
 
-        if "shortName" not in res and "longName" in res:
-            res["shortName"] = res["longName"]
-        elif "shortName" not in res:
-            res["shortName"] = res["symbol"]
+        if arg:
+            out = base_out_period
 
-        if arg is not None:
-            cookie, crumb = get_yahoo_quotes.get_cookie_crumb(fticker)
-            data_list = get_yahoo_quotes.get_data_list(
-                fticker, startDateUnix, endDateUnix, cookie, crumb
-            )
+            history = t.history(arg, "1d")
+            history_as_dict = history.to_dict()
 
-            if data_list:
-                old = data_list[0]["Close"]
-                startDate = data_list[0]["Date"]
-                percentage = (res.get("regularMarketPrice") - old) / old
-                percentage *= 100.0
+            close = history_as_dict.get("close")
+            close_keys = list(close.keys())
+            start_key = close_keys[0]
+            end_key = close_keys[-1]
+            start_info = close.get(start_key)
+            end_info = close.get(end_key)
 
-                res["startdate"] = startDate
-                res["enddate"] = endDate
-                res["old_quote"] = old
+            res["startdate"] = start_key[1]
+            res["enddate"] = end_key[1]
+            res["old_quote"] = start_info
 
-                out = base_out_period
-                out += formatPercentage(percentage)
-            else:
-                out = (
-                    "Found no historical data for "
-                    + formatBold(ticker)
-                    + "at yahoo finance"
-                )
+            percentage = (res.get("regularMarketPrice") - start_info) / start_info
+
         else:
             out = base_out
-            out += formatPercentage(percentage)
-            out += extra_out
+            percentage = res["regularMarketChangePercent"]
 
-        res["shortName"] = formatBold(res["shortName"])
-        res["dayRange"] = (
-            ". "
-            + formatBold("Day range")
-            + ": {regularMarketDayLow}-{regularMarketDayHigh}".format(**res)
-        )
-        res["dayVolume"] = (
-            ". " + formatBold("Day volume") + ": {regularMarketVolume}".format(**res)
-        )
-        if "marketCap" in res:
-            res["marketCap"] = res["marketCap"] / 1000000.0
-            res["netWorth"] = (
-                ". "
-                + formatBold("Net worth")
-                + ": {marketCap:.2f} M{currency}".format(**res)
-            )
-        else:
-            res["netWorth"] = ""
-
-        if "trailingPE" in res:
-            res["pe"] = (
-                ". " + formatBold("Trailing P/E") + ": {trailingPE:.2f}".format(**res)
-            )
-        else:
-            res["pe"] = ""
-
-        if "currency" not in res:
-            res["currency"] = ""
+        percentage *= 100.0
+        out += formatPercentage(percentage)
         out = out.format(**res)
         output(out)
 
@@ -435,13 +272,8 @@ def test():
     arg = "3d"
 
     runMe(tickers, arg)
-
-
-def test2():
-    da = "omxs30"
-    res = findTickers(da, maxresult=20)
+    findTickers("pricer")
 
 
 if __name__ == "__main__":
     test()
-    # test2()
