@@ -102,7 +102,12 @@ def runMe(tickers, arg=None):
         res.update(t.summary_detail)
 
         price_info = t.price
-        res.update(price_info.get(fticker))
+        price_info_ticker = price_info.get(fticker)
+        if isinstance(price_info_ticker, str):
+            output(price_info_ticker)
+            continue
+
+        res.update(price_info_ticker)
 
         if arg:
             out = base_out_period
@@ -253,7 +258,7 @@ except:
 
 
 def test():
-    tickers = "PRIC-B.ST"
+    # tickers = "PRIC-B.ST"
     # tickers = 'G5EN.ST'
     # tickers = 'G5EN.ST,PRIC-B.ST'
     # tickers = 'apple,pricer'
@@ -264,15 +269,16 @@ def test():
     # tickers = 'kkd'
     # tickers = 'fingerprint'
     # tickers = u'marketing group'
+    tickers = "foooooobar.st"
 
     # arg = '1m'
     # arg = '1y'
     # arg = yt'15d'
-    # arg = None
-    arg = "3d"
+    arg = None
+    # arg = "3d"
 
     runMe(tickers, arg)
-    findTickers("pricer")
+    # findTickers("pricer")
 
 
 if __name__ == "__main__":
