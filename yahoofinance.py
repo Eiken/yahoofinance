@@ -146,14 +146,7 @@ def set_current_bot(bot):
 @module.commands("yf", "y")
 def yf(bot, trigger):
     args = trigger.group(2)
-    splitargs = args.split(" ")
-
-    if re.search("\d+d|\d+m|\d+y", splitargs[-1]):
-        arg = splitargs[-1]
-        tickers = " ".join(splitargs[:-1])
-    else:
-        arg = None
-        tickers = " ".join(splitargs)
+    tickers, arg = parse_args(args)
 
     set_current_bot(bot)
     runMe(tickers, arg)
@@ -250,29 +243,46 @@ def omxen(bot, trigger):
     runMe(tickers)
 
 
-def test():
-    tickers = "PRIC-B.ST"
-    # tickers = 'G5EN.ST'
-    # tickers = 'G5EN.ST,PRIC-B.ST'
-    # tickers = 'apple,pricer'
-    # tickers = 'microsoft,fingerprint,pricer'
-    # tickers = 'pricer,BTCUSD=X'
-    # tickers = 'DOGE-USD'
-    # tickers = 'indu-c'
-    # tickers = 'kkd'
-    # tickers = 'fingerprint'
-    # tickers = u'marketing group'
-    # tickers = "foooooobar.st"
+def parse_args(args):
+    splitargs = args.split(" ")
 
-    # arg = '1m'
-    # arg = '1y'
-    # arg = yt'15d'
-    arg = None
-    arg = "3d"
+    if len(splitargs) == 1:
+        return splitargs[0], None
+    else:
+        return " ".join(splitargs[:-1]), splitargs[-1]
 
-    runMe(tickers, arg)
-    # findTickers("pricer")
+
+def test_current_quote():
+    args = [
+        "PRIC-B.ST",
+        "G5EN.ST",
+        "G5EN.ST,PRIC-B.ST",
+        "apple,pricer",
+        "microsoft,fingerprint,pricer",
+        "pricer,BTC-USD",
+        "DOGE-USD",
+        "foooooobar.st",
+    ]
+    for a in args:
+        print(a)
+        tickers, arg = parse_args(a)
+        runMe(tickers, arg)
+
+
+def test_find_tickers():
+    findTickers("baba")
+
+
+def test_historical_quotes():
+    hist = ["1m", "1mo", "5d", "1y", "1wk", "max"]
+    for h in hist:
+        args = "pricer " + h
+        print(args)
+        tickers, arg = parse_args(args)
+        runMe(tickers, arg)
 
 
 if __name__ == "__main__":
-    test()
+    # test_current_quote()
+    # test_historical_quotes()
+    test_find_tickers()
