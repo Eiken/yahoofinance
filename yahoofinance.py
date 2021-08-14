@@ -88,7 +88,7 @@ def runMe(tickers, arg=None):
     tickers = tickers.split(",")
     totalPercentage = []
 
-    base_out_period = "{shortName} ({symbol}): {startdate:%Y-%m-%d} - {enddate:%Y-%m-%d}: {old_quote} - {regularMarketPrice} {currency} "
+    base_out_period = "{shortName} ({symbol}): {startdate:%Y-%m-%d} - {enddate:%Y-%m-%d}: {old_quote:.2f} - {regularMarketPrice} {currency} "
     base_out = "{shortName} ({symbol}): {regularMarketPrice} {currency} "
 
     for ticker in tickers:
@@ -138,127 +138,120 @@ def runMe(tickers, arg=None):
         output(out)
 
 
-try:
-
-    @module.commands("yf", "y")
-    def yf(bot, trigger):
-        args = trigger.group(2)
-        splitargs = args.split(" ")
-
-        if re.search("\d+d|\d+m|\d+y", splitargs[-1]):
-            arg = splitargs[-1]
-            tickers = " ".join(splitargs[:-1])
-        else:
-            arg = None
-            tickers = " ".join(splitargs)
-
-        global botten
-        botten = bot
-        runMe(tickers, arg)
-
-    @module.commands("yfind")
-    def yfind(bot, trigger):
-        global botten
-        botten = bot
-        ticker = trigger.group(2)
-        findTickers(ticker)
-
-    # shortcuts
-
-    @module.commands("aud")
-    def audsek(bot, trigger):
-        tickers = "audsek=x"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("bitte", "btcusd", "btc")
-    def bitte(bot, trigger):
-        tickers = "BTC-USD"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("ada", "cardano")
-    def adan(bot, trigger):
-        tickers = "BTC-USD"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("eth", "ether")
-    def eth(bot, trigger):
-        tickers = "ETH-USD"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("doge")
-    def doggi(bot, trigger):
-        tickers = "DOGE-USD"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("wsb", "wallstreetbets", "yesorno")
-    def wsb(bot, trigger):
-        tickers = "GME,AMC,TSLA,NOK,RKT,PLTR,NIO"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("crypto")
-    def crypto(bot, trigger):
-        tickers = "BTC-USD,ETH-USD,XRP-USD,DOGE-USD"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("metal")
-    def metal(bot, trigger):
-        tickers = "GC=F,SI=F,HG=F"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("oil")
-    def olja(bot, trigger):
-        tickers = "CL=F,BZ=F,HO=F"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("asien")
-    def asia(bot, trigger):
-        tickers = "399001.SZ,^HSI,^N225"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("börsen")
-    def borsen(bot, trigger):
-        tickers = "^OMX,^GDAXI,^GSPC,BTC-USD"
-        global botten
-        botten = bot
-        runMe(tickers)
-
-    @module.commands("omx")
-    def omxen(bot, trigger):
-        tickers = "^OMX"
-        global botten
-        botten = bot
-        runMe(tickers)
+def set_current_bot(bot):
+    global botten
+    botten = bot
 
 
-except:
-    # module not available
-    # import traceback
-    # traceback.print_exc(file=sys.stdout)
-    pass
+@module.commands("yf", "y")
+def yf(bot, trigger):
+    args = trigger.group(2)
+    splitargs = args.split(" ")
+
+    if re.search("\d+d|\d+m|\d+y", splitargs[-1]):
+        arg = splitargs[-1]
+        tickers = " ".join(splitargs[:-1])
+    else:
+        arg = None
+        tickers = " ".join(splitargs)
+
+    set_current_bot(bot)
+    runMe(tickers, arg)
+
+
+@module.commands("yfind")
+def yfind(bot, trigger):
+    set_current_bot(bot)
+    ticker = trigger.group(2)
+    findTickers(ticker)
+
+
+@module.commands("aud")
+def audsek(bot, trigger):
+    tickers = "audsek=x"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("bitte", "btcusd", "btc")
+def bitte(bot, trigger):
+    tickers = "BTC-USD"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("ada", "cardano")
+def adan(bot, trigger):
+    tickers = "BTC-USD"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("eth", "ether")
+def eth(bot, trigger):
+    tickers = "ETH-USD"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("doge")
+def doggi(bot, trigger):
+    tickers = "DOGE-USD"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("wsb", "wallstreetbets", "yesorno")
+def wsb(bot, trigger):
+    tickers = "GME,AMC,TSLA,NOK,RKT,PLTR,NIO"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("crypto")
+def crypto(bot, trigger):
+    tickers = "BTC-USD,ETH-USD,XRP-USD,DOGE-USD"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("metal")
+def metal(bot, trigger):
+    tickers = "GC=F,SI=F,HG=F"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("oil")
+def olja(bot, trigger):
+    tickers = "CL=F,BZ=F,HO=F"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("asien")
+def asia(bot, trigger):
+    tickers = "399001.SZ,^HSI,^N225"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("börsen")
+def borsen(bot, trigger):
+    tickers = "^OMX,^GDAXI,^GSPC,BTC-USD"
+    set_current_bot(bot)
+    runMe(tickers)
+
+
+@module.commands("omx")
+def omxen(bot, trigger):
+    tickers = "^OMX"
+    set_current_bot(bot)
+    runMe(tickers)
 
 
 def test():
-    # tickers = "PRIC-B.ST"
+    tickers = "PRIC-B.ST"
     # tickers = 'G5EN.ST'
     # tickers = 'G5EN.ST,PRIC-B.ST'
     # tickers = 'apple,pricer'
@@ -269,13 +262,13 @@ def test():
     # tickers = 'kkd'
     # tickers = 'fingerprint'
     # tickers = u'marketing group'
-    tickers = "foooooobar.st"
+    # tickers = "foooooobar.st"
 
     # arg = '1m'
     # arg = '1y'
     # arg = yt'15d'
     arg = None
-    # arg = "3d"
+    arg = "3d"
 
     runMe(tickers, arg)
     # findTickers("pricer")
